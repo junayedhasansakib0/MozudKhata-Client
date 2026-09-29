@@ -34,6 +34,9 @@ export function AppShell() {
               MozudKhata
             </Link>
             <nav className="flex items-center gap-4">
+              <NavLink to="/" end className={navLinkClass}>
+                Dashboard
+              </NavLink>
               <NavLink to="/products" className={navLinkClass}>
                 Products
               </NavLink>

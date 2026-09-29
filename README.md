@@ -43,7 +43,8 @@ Feature-first modules under `src/features/<feature>/` (`auth`, `inventory`), eac
 - **Auth:** register, login, logout, profile update, password change; session-aware routing.
 - **Inventory:** category management (add/rename/archive/restore); product create/edit/archive with server-derived stock status (in stock / low / out); paginated product list with **search (name/SKU), category filter, stock-status filter, and sorting**; product detail.
 - **Stock:** record IN / OUT / ADJUSTMENT / DAMAGED_LOST movements with reason capture and an advisory over-draw guardrail (the server's `409` is authoritative); per-product movement history.
+- **Dashboard:** at-a-glance overview — stat cards (products, stock units, low/out-of-stock, categories) and a recent-activity feed, with get-started and empty states.
 
 ## Status
 
-**Phase 06 — Search & Filtering complete.** Auth UI, inventory (categories/products) UI, stock movement form + history, and product-list search/filter/sort are implemented against the API contract. **23 tests** pass; typecheck / lint / build green. Next: Phase 07 — dashboard. See [../PROJECT_STATE.md](../PROJECT_STATE.md) for the live snapshot.
+**Phase 07 — Dashboard complete.** Auth UI, inventory (categories/products) UI, stock movement form + history, product-list search/filter/sort, and the dashboard (stat cards + recent activity + empty states over `GET /dashboard`) are implemented against the API contract. **25 tests** pass; typecheck / lint / build green. Next: Phase 08 — history & analytics. See [../PROJECT_STATE.md](../PROJECT_STATE.md) for the live snapshot.
