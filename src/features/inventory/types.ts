@@ -44,6 +44,21 @@ export interface ProductPage {
   meta: PageMeta;
 }
 
+/** Product list query params (docs/api.md §Phase 06 — search/filter/sort). */
+export type ProductSort = "name" | "createdAt" | "updatedAt" | "quantity";
+export type SortOrder = "asc" | "desc";
+
+export interface ProductListParams {
+  page?: number;
+  pageSize?: number;
+  includeArchived?: boolean;
+  q?: string;
+  categoryId?: string;
+  stockStatus?: StockStatus;
+  sort?: ProductSort;
+  order?: SortOrder;
+}
+
 /** Stock ledger types mirroring the server's public shapes (docs/api.md §Phase 05). */
 
 export type MovementType = "IN" | "OUT" | "ADJUSTMENT" | "DAMAGED_LOST";

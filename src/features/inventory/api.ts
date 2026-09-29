@@ -1,5 +1,13 @@
 import { apiFetch, apiGetWithMeta } from "@/lib/api";
-import type { Category, MovementType, PageMeta, Product, ProductPage, StockMovement } from "./types";
+import type {
+  Category,
+  MovementType,
+  PageMeta,
+  Product,
+  ProductListParams,
+  ProductPage,
+  StockMovement,
+} from "./types";
 
 /** Inventory HTTP calls, routed through the typed API client (docs/api.md §Phase 04). */
 
@@ -47,15 +55,16 @@ export interface ProductInput {
   description?: string | null;
 }
 
-export function listProducts(params: {
-  page?: number;
-  pageSize?: number;
-  includeArchived?: boolean;
-}): Promise<ProductPage> {
+export function listProducts(params: ProductListParams): Promise<ProductPage> {
   const qs = new URLSearchParams();
   if (params.page) qs.set("page", String(params.page));
   if (params.pageSize) qs.set("pageSize", String(params.pageSize));
   if (params.includeArchived) qs.set("includeArchived", "true");
+  if (params.q) qs.set("q", params.q);
+  if (params.categoryId) qs.set("categoryId", params.categoryId);
+  if (params.stockStatus) qs.set("stockStatus", params.stockStatus);
+  if (params.sort) qs.set("sort", params.sort);
+  if (params.order) qs.set("order", params.order);
   const query = qs.toString();
   return apiGetWithMeta<{ products: Product[] }>(`/products${query ? `?${query}` : ""}`).then(
     (res) => ({ products: res.data.products, meta: res.meta as unknown as PageMeta }),

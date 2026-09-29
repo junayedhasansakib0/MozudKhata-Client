@@ -1,18 +1,76 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button-variants";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import { StockStatusBadge } from "@/features/inventory/components/stock-status-badge";
-import { useProducts } from "@/features/inventory/hooks";
+import { useCategories, useProducts } from "@/features/inventory/hooks";
+import type { ProductSort, SortOrder, StockStatus } from "@/features/inventory/types";
 
 const PAGE_SIZE = 20;
 
+/** Debounce a fast-changing value (e.g. the search box) to avoid a request per keystroke. */
+function useDebouncedValue<T>(value: T, delayMs: number): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), delayMs);
+    return () => clearTimeout(id);
+  }, [value, delayMs]);
+  return debounced;
+}
+
+const SORT_OPTIONS: { value: `${ProductSort}:${SortOrder}`; label: string }[] = [
+  { value: "name:asc", label: "Name (A–Z)" },
+  { value: "name:desc", label: "Name (Z–A)" },
+  { value: "quantity:desc", label: "Quantity (high → low)" },
+  { value: "quantity:asc", label: "Quantity (low → high)" },
+  { value: "updatedAt:desc", label: "Recently updated" },
+  { value: "createdAt:desc", label: "Newest" },
+];
+
+const STATUS_OPTIONS: { value: StockStatus; label: string }[] = [
+  { value: "IN_STOCK", label: "In stock" },
+  { value: "LOW", label: "Low" },
+  { value: "OUT", label: "Out of stock" },
+];
+
 export function ProductsPage() {
   const [page, setPage] = useState(1);
-  const { data, isLoading, isError, error } = useProducts({ page, pageSize: PAGE_SIZE });
+  const [search, setSearch] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [stockStatus, setStockStatus] = useState<StockStatus | "">("");
+  const [sortKey, setSortKey] = useState<`${ProductSort}:${SortOrder}`>("name:asc");
+
+  const debouncedSearch = useDebouncedValue(search.trim(), 300);
+  const [sort, order] = sortKey.split(":") as [ProductSort, SortOrder];
+
+  // Any filter/sort change resets to the first page so results stay coherent.
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, categoryId, stockStatus, sortKey]);
+
+  const { data: categories } = useCategories();
+
+  const params = useMemo(
+    () => ({
+      page,
+      pageSize: PAGE_SIZE,
+      q: debouncedSearch || undefined,
+      categoryId: categoryId || undefined,
+      stockStatus: stockStatus || undefined,
+      sort,
+      order,
+    }),
+    [page, debouncedSearch, categoryId, stockStatus, sort, order],
+  );
+
+  const { data, isLoading, isError, error } = useProducts(params);
 
   const meta = data?.meta;
   const products = data?.products ?? [];
+  const hasFilters = Boolean(debouncedSearch || categoryId || stockStatus);
 
   return (
     <section className="space-y-6">
@@ -31,6 +89,63 @@ export function ProductsPage() {
         </div>
       </div>
 
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="product-search">Search</Label>
+          <Input
+            id="product-search"
+            type="search"
+            placeholder="Name or SKU"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="product-category">Category</Label>
+          <Select
+            id="product-category"
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+          >
+            <option value="">All categories</option>
+            {(categories ?? []).map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </Select>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="product-status">Stock status</Label>
+          <Select
+            id="product-status"
+            value={stockStatus}
+            onChange={(e) => setStockStatus(e.target.value as StockStatus | "")}
+          >
+            <option value="">Any status</option>
+            {STATUS_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </Select>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="product-sort">Sort by</Label>
+          <Select
+            id="product-sort"
+            value={sortKey}
+            onChange={(e) => setSortKey(e.target.value as `${ProductSort}:${SortOrder}`)}
+          >
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </Select>
+        </div>
+      </div>
+
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Loading products…</p>
       ) : isError ? (
@@ -40,11 +155,17 @@ export function ProductsPage() {
       ) : products.length === 0 ? (
         <div className="rounded-lg border bg-card p-8 text-center text-card-foreground">
           <p className="text-sm text-muted-foreground">
-            No products yet.{" "}
-            <Link to="/products/new" className="font-medium text-primary hover:underline">
-              Add your first product
-            </Link>
-            .
+            {hasFilters ? (
+              "No products match these filters."
+            ) : (
+              <>
+                No products yet.{" "}
+                <Link to="/products/new" className="font-medium text-primary hover:underline">
+                  Add your first product
+                </Link>
+                .
+              </>
+            )}
           </p>
         </div>
       ) : (

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as inventoryApi from "./api";
 import type { MovementInput, ProductInput } from "./api";
+import type { ProductListParams } from "./types";
 
 /** TanStack Query hooks for inventory (mirrors features/auth/hooks.ts patterns). */
 
@@ -55,7 +56,7 @@ export function useRestoreCategory() {
 
 // --- Products ---
 
-export function useProducts(params: { page: number; pageSize: number; includeArchived?: boolean }) {
+export function useProducts(params: ProductListParams) {
   return useQuery({
     queryKey: [...productsKey, params] as const,
     queryFn: () => inventoryApi.listProducts(params),
