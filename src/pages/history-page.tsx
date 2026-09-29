@@ -139,9 +139,10 @@ export function HistoryPage() {
         </div>
       </div>
 
-      {/* PLACEHOLDER_TABLE */}
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading history…</p>
+        <p role="status" className="text-sm text-muted-foreground">
+          Loading history…
+        </p>
       ) : isError ? (
         <p role="alert" className="text-sm text-destructive">
           {error instanceof Error ? error.message : "Failed to load movement history."}

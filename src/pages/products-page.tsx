@@ -96,6 +96,7 @@ export function ProductsPage() {
             id="product-search"
             type="search"
             placeholder="Name or SKU"
+            autoComplete="off"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -147,7 +148,9 @@ export function ProductsPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading products…</p>
+        <p role="status" className="text-sm text-muted-foreground">
+          Loading products…
+        </p>
       ) : isError ? (
         <p role="alert" className="text-sm text-destructive">
           {error instanceof Error ? error.message : "Failed to load products."}
@@ -173,11 +176,11 @@ export function ProductsPage() {
           <table className="w-full text-sm">
             <thead className="border-b bg-muted/50 text-left text-muted-foreground">
               <tr>
-                <th className="px-4 py-2 font-medium">Name</th>
-                <th className="px-4 py-2 font-medium">SKU</th>
-                <th className="px-4 py-2 font-medium">Category</th>
-                <th className="px-4 py-2 text-right font-medium">Quantity</th>
-                <th className="px-4 py-2 font-medium">Status</th>
+                <th scope="col" className="px-4 py-2 font-medium">Name</th>
+                <th scope="col" className="px-4 py-2 font-medium">SKU</th>
+                <th scope="col" className="px-4 py-2 font-medium">Category</th>
+                <th scope="col" className="px-4 py-2 text-right font-medium">Quantity</th>
+                <th scope="col" className="px-4 py-2 font-medium">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y">

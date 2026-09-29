@@ -8,7 +8,11 @@ export function ProductEditPage() {
   const { data: product, isLoading, isError, error } = useProduct(id);
 
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading product…</p>;
+    return (
+      <p role="status" className="text-sm text-muted-foreground">
+        Loading product…
+      </p>
+    );
   }
 
   if (isError || !product) {

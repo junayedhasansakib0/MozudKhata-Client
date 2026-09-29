@@ -31,7 +31,13 @@ export function ProfileForm({ user }: { user: User }) {
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
       <div className="space-y-1.5">
         <Label htmlFor="profile-email">Email</Label>
-        <Input id="profile-email" value={user.email} readOnly disabled />
+        <Input
+          id="profile-email"
+          value={user.email}
+          readOnly
+          aria-readonly="true"
+          className="bg-muted text-muted-foreground"
+        />
       </div>
 
       <div className="space-y-1.5">
@@ -40,9 +46,14 @@ export function ProfileForm({ user }: { user: User }) {
           id="profile-name"
           autoComplete="name"
           aria-invalid={Boolean(errors.name)}
+          aria-describedby={errors.name ? "profile-name-error" : undefined}
           {...register("name")}
         />
-        {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+        {errors.name && (
+          <p id="profile-name-error" className="text-sm text-destructive">
+            {errors.name.message}
+          </p>
+        )}
       </div>
 
       {rootError && (

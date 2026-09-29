@@ -34,9 +34,14 @@ export function LoginForm() {
           type="email"
           autoComplete="email"
           aria-invalid={Boolean(errors.email)}
+          aria-describedby={errors.email ? "email-error" : undefined}
           {...register("email")}
         />
-        {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+        {errors.email && (
+          <p id="email-error" className="text-sm text-destructive">
+            {errors.email.message}
+          </p>
+        )}
       </div>
 
       <div className="space-y-1.5">
@@ -46,9 +51,14 @@ export function LoginForm() {
           type="password"
           autoComplete="current-password"
           aria-invalid={Boolean(errors.password)}
+          aria-describedby={errors.password ? "password-error" : undefined}
           {...register("password")}
         />
-        {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
+        {errors.password && (
+          <p id="password-error" className="text-sm text-destructive">
+            {errors.password.message}
+          </p>
+        )}
       </div>
 
       {rootError && (

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ApiError } from "@/lib/api";
+import { ApiError, describeApiError } from "@/lib/api";
 import type { MovementInput } from "../api";
 import { useRecordMovement } from "../hooks";
 import { movementFormSchema, type MovementFormValues } from "../schema";
@@ -65,7 +65,7 @@ export function StockMovementForm({ product }: { product: Product }) {
 
   const error = recordMovement.error;
   const rootError =
-    error instanceof ApiError ? error.message : error ? "Something went wrong." : null;
+    error instanceof ApiError ? describeApiError(error) : error ? "Something went wrong." : null;
 
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
@@ -88,12 +88,15 @@ export function StockMovementForm({ product }: { product: Product }) {
             inputMode="decimal"
             placeholder={type === "ADJUSTMENT" ? "e.g. -3 or 5" : "0"}
             aria-invalid={Boolean(errors.quantity)}
+            aria-describedby={errors.quantity ? "movement-quantity-error" : "movement-quantity-hint"}
             {...register("quantity")}
           />
           {errors.quantity ? (
-            <p className="text-sm text-destructive">{errors.quantity.message}</p>
+            <p id="movement-quantity-error" className="text-sm text-destructive">
+              {errors.quantity.message}
+            </p>
           ) : (
-            <p className="text-xs text-muted-foreground">
+            <p id="movement-quantity-hint" className="text-xs text-muted-foreground">
               {type === "ADJUSTMENT"
                 ? "Signed correction — negative lowers the count."
                 : "Amount to add or remove."}
@@ -109,9 +112,14 @@ export function StockMovementForm({ product }: { product: Product }) {
           rows={2}
           placeholder="Why this movement happened"
           aria-invalid={Boolean(errors.reason)}
+          aria-describedby={errors.reason ? "movement-reason-error" : undefined}
           {...register("reason")}
         />
-        {errors.reason && <p className="text-sm text-destructive">{errors.reason.message}</p>}
+        {errors.reason && (
+          <p id="movement-reason-error" className="text-sm text-destructive">
+            {errors.reason.message}
+          </p>
+        )}
       </div>
 
       {rootError && (

@@ -47,7 +47,7 @@ function StatCard({
     <Card>
       <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
         <CardDescription>{label}</CardDescription>
-        <Icon className={cn("h-4 w-4 text-muted-foreground", accent)} />
+        <Icon className={cn("h-4 w-4 text-muted-foreground", accent)} aria-hidden />
       </CardHeader>
       <CardContent>
         <div className={cn("text-2xl font-semibold tracking-tight", accent)}>{value}</div>
@@ -96,10 +96,14 @@ export function DashboardPage() {
         <p className="text-muted-foreground">An at-a-glance overview of your inventory.</p>
       </div>
 
-      {isLoading && <p className="text-sm text-muted-foreground">Loading dashboard…</p>}
+      {isLoading && (
+        <p role="status" className="text-sm text-muted-foreground">
+          Loading dashboard…
+        </p>
+      )}
 
       {isError && (
-        <p className="text-sm text-destructive">
+        <p role="alert" className="text-sm text-destructive">
           Couldn&apos;t load the dashboard: {(error as Error).message}
         </p>
       )}
@@ -149,7 +153,7 @@ export function DashboardPage() {
                   <CardTitle>Recent activity</CardTitle>
                   <CardDescription>Latest stock movements across your products.</CardDescription>
                 </div>
-                <Activity className="h-4 w-4 text-muted-foreground" />
+                <Activity className="h-4 w-4 text-muted-foreground" aria-hidden />
               </CardHeader>
               <CardContent>
                 {data.recentActivity.length === 0 ? (

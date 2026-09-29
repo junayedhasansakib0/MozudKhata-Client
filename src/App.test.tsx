@@ -39,6 +39,23 @@ describe("App shell", () => {
             { status: 401, headers: { "content-type": "application/json" } },
           );
         }
+        // Dashboard aggregate: return a valid, empty overview so DashboardPage
+        // renders its empty state rather than throwing on a missing shape.
+        if (url.includes("/dashboard")) {
+          return new Response(
+            JSON.stringify({
+              data: {
+                totalProducts: 0,
+                totalStockUnits: "0",
+                lowStockCount: 0,
+                outOfStockCount: 0,
+                categoryCount: 0,
+                recentActivity: [],
+              },
+            }),
+            { status: 200, headers: { "content-type": "application/json" } },
+          );
+        }
         return new Response(
           JSON.stringify({ data: { status: "ok", uptime: 1, version: "0.1.0" } }),
           { status: 200, headers: { "content-type": "application/json" } },

@@ -31,42 +31,55 @@ function CategoryRow({ category }: { category: Category }) {
     setEditing(false);
   };
 
-  return (
-    <li className="flex items-center justify-between gap-3 py-2">
-      {editing ? (
-        <Input
-          value={name}
-          autoFocus
-          onChange={(e) => setName(e.target.value)}
-          className="max-w-xs"
-        />
-      ) : (
-        <span className="flex items-center gap-2">
-          <span className={isArchived ? "text-muted-foreground line-through" : undefined}>
-            {category.name}
-          </span>
-          {isArchived && <Badge variant="muted">Archived</Badge>}
-        </span>
-      )}
+  const cancel = () => {
+    setEditing(false);
+    setName(category.name);
+  };
 
-      <div className="flex gap-2">
-        {editing ? (
-          <>
-            <Button size="sm" onClick={save} disabled={updateCategory.isPending}>
+  if (editing) {
+    return (
+      <li className="py-2">
+        <form
+          className="flex items-center justify-between gap-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void save();
+          }}
+        >
+          <Input
+            value={name}
+            autoFocus
+            aria-label="Category name"
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") cancel();
+            }}
+            className="max-w-xs"
+          />
+          <div className="flex gap-2">
+            <Button size="sm" type="submit" disabled={updateCategory.isPending}>
               Save
             </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                setEditing(false);
-                setName(category.name);
-              }}
-            >
+            <Button size="sm" type="button" variant="ghost" onClick={cancel}>
               Cancel
             </Button>
-          </>
-        ) : isArchived ? (
+          </div>
+        </form>
+      </li>
+    );
+  }
+
+  return (
+    <li className="flex items-center justify-between gap-3 py-2">
+      <span className="flex items-center gap-2">
+        <span className={isArchived ? "text-muted-foreground line-through" : undefined}>
+          {category.name}
+        </span>
+        {isArchived && <Badge variant="muted">Archived</Badge>}
+      </span>
+
+      <div className="flex gap-2">
+        {isArchived ? (
           <Button
             size="sm"
             variant="outline"
@@ -104,7 +117,9 @@ export function CategoryManager() {
       <CategoryForm />
 
       {categories.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading categories…</p>
+        <p role="status" className="text-sm text-muted-foreground">
+          Loading categories…
+        </p>
       ) : categories.data && categories.data.length > 0 ? (
         <ul className="divide-y">
           {categories.data.map((c) => (

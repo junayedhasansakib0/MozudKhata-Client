@@ -20,7 +20,11 @@ export function MovementHistory({ product }: { product: Product }) {
   const { data: movements, isLoading, isError, error } = useProductMovements(product.id);
 
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading history…</p>;
+    return (
+      <p role="status" className="text-sm text-muted-foreground">
+        Loading history…
+      </p>
+    );
   }
 
   if (isError) {

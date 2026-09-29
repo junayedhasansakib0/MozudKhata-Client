@@ -48,11 +48,20 @@ async function request<T>(path: string, options: RequestInit): Promise<T> {
   try {
     response = await fetch(url, {
       credentials: "include",
+      ...options,
+      // `headers` must come last: spreading `...options` above also carries
+      // `options.headers` (e.g. the CSRF header), which would otherwise clobber
+      // the whole headers object and drop the merged headers below.
       headers: {
-        "Content-Type": "application/json",
+        // Only declare a JSON body when there actually is one. Bodyless mutations
+        // (archive/restore POSTs) must NOT send `Content-Type: application/json`,
+        // or Fastify's JSON parser rejects the empty body with a 400 ("Invalid
+        // request."). Requests WITH a body still get the header — and it coexists
+        // with the CSRF header below, without which the browser falls back to
+        // `text/plain` and the API rejects the (now string) body.
+        ...(options.body != null ? { "Content-Type": "application/json" } : {}),
         ...options.headers,
       },
-      ...options,
     });
   } catch {
     throw new ApiError("NETWORK", "Unable to reach the server.", 0, undefined);
@@ -73,6 +82,19 @@ async function request<T>(path: string, options: RequestInit): Promise<T> {
   }
 
   return (body as SuccessEnvelope<T>).data;
+}
+
+/**
+ * Human-readable summary of an `ApiError`, including the backend's per-field
+ * validation `details` when present — so forms surface *which* field failed and
+ * why, instead of only the generic "Request validation failed." message.
+ */
+export function describeApiError(error: unknown): string {
+  if (!(error instanceof ApiError)) return "Something went wrong.";
+  const fieldErrors = (error.details ?? [])
+    .filter((d) => d.path)
+    .map((d) => `${d.path}: ${d.message}`);
+  return fieldErrors.length ? `${error.message} (${fieldErrors.join("; ")})` : error.message;
 }
 
 /**

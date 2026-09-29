@@ -40,6 +40,7 @@ export function CategoryForm() {
           <Input
             id="category-name"
             aria-invalid={Boolean(errors.name)}
+            aria-describedby={errors.name ? "category-name-error" : undefined}
             placeholder="e.g. Beverages"
             {...register("name")}
           />
@@ -47,7 +48,11 @@ export function CategoryForm() {
             {isSubmitting ? "Adding…" : "Add"}
           </Button>
         </div>
-        {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+        {errors.name && (
+          <p id="category-name-error" className="text-sm text-destructive">
+            {errors.name.message}
+          </p>
+        )}
         {rootError && (
           <p role="alert" className="text-sm text-destructive">
             {rootError}

@@ -68,28 +68,40 @@ export function ProductForm({ product }: { product?: Product }) {
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
       <div className="space-y-1.5">
         <Label htmlFor="name">Name</Label>
-        <Input id="name" aria-invalid={Boolean(errors.name)} {...register("name")} />
-        {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+        <Input id="name" aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? "name-error" : undefined} {...register("name")} />
+        {errors.name && (
+          <p id="name-error" className="text-sm text-destructive">
+            {errors.name.message}
+          </p>
+        )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="sku">SKU (optional)</Label>
-          <Input id="sku" aria-invalid={Boolean(errors.sku)} {...register("sku")} />
-          {errors.sku && <p className="text-sm text-destructive">{errors.sku.message}</p>}
+          <Input id="sku" aria-invalid={Boolean(errors.sku)} aria-describedby={errors.sku ? "sku-error" : undefined} {...register("sku")} />
+          {errors.sku && (
+            <p id="sku-error" className="text-sm text-destructive">
+              {errors.sku.message}
+            </p>
+          )}
         </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="unit">Unit (optional)</Label>
-          <Input id="unit" placeholder="pcs" aria-invalid={Boolean(errors.unit)} {...register("unit")} />
-          {errors.unit && <p className="text-sm text-destructive">{errors.unit.message}</p>}
+          <Input id="unit" placeholder="pcs" aria-invalid={Boolean(errors.unit)} aria-describedby={errors.unit ? "unit-error" : undefined} {...register("unit")} />
+          {errors.unit && (
+            <p id="unit-error" className="text-sm text-destructive">
+              {errors.unit.message}
+            </p>
+          )}
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="categoryId">Category</Label>
-          <Select id="categoryId" aria-invalid={Boolean(errors.categoryId)} {...register("categoryId")}>
+          <Select id="categoryId" aria-invalid={Boolean(errors.categoryId)} aria-describedby={errors.categoryId ? "categoryId-error" : undefined} {...register("categoryId")}>
             <option value="">Uncategorized</option>
             {categories.data?.map((c) => (
               <option key={c.id} value={c.id}>
@@ -98,7 +110,9 @@ export function ProductForm({ product }: { product?: Product }) {
             ))}
           </Select>
           {errors.categoryId && (
-            <p className="text-sm text-destructive">{errors.categoryId.message}</p>
+            <p id="categoryId-error" className="text-sm text-destructive">
+              {errors.categoryId.message}
+            </p>
           )}
         </div>
 
@@ -109,12 +123,17 @@ export function ProductForm({ product }: { product?: Product }) {
             inputMode="decimal"
             placeholder="0"
             aria-invalid={Boolean(errors.lowStockThreshold)}
+            aria-describedby={errors.lowStockThreshold ? "lowStockThreshold-error" : "lowStockThreshold-hint"}
             {...register("lowStockThreshold")}
           />
           {errors.lowStockThreshold ? (
-            <p className="text-sm text-destructive">{errors.lowStockThreshold.message}</p>
+            <p id="lowStockThreshold-error" className="text-sm text-destructive">
+              {errors.lowStockThreshold.message}
+            </p>
           ) : (
-            <p className="text-xs text-muted-foreground">Stock at or below this counts as low.</p>
+            <p id="lowStockThreshold-hint" className="text-xs text-muted-foreground">
+              Stock at or below this counts as low.
+            </p>
           )}
         </div>
       </div>
@@ -124,10 +143,13 @@ export function ProductForm({ product }: { product?: Product }) {
         <Textarea
           id="description"
           aria-invalid={Boolean(errors.description)}
+          aria-describedby={errors.description ? "description-error" : undefined}
           {...register("description")}
         />
         {errors.description && (
-          <p className="text-sm text-destructive">{errors.description.message}</p>
+          <p id="description-error" className="text-sm text-destructive">
+            {errors.description.message}
+          </p>
         )}
       </div>
 

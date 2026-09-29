@@ -20,7 +20,11 @@ export function ProductDetailPage() {
   const restoreProduct = useRestoreProduct();
 
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading product…</p>;
+    return (
+      <p role="status" className="text-sm text-muted-foreground">
+        Loading product…
+      </p>
+    );
   }
 
   if (isError || !product) {

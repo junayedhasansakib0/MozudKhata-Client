@@ -51,10 +51,13 @@ export function ChangePasswordForm() {
           type="password"
           autoComplete="current-password"
           aria-invalid={Boolean(errors.currentPassword)}
+          aria-describedby={errors.currentPassword ? "currentPassword-error" : undefined}
           {...register("currentPassword")}
         />
         {errors.currentPassword && (
-          <p className="text-sm text-destructive">{errors.currentPassword.message}</p>
+          <p id="currentPassword-error" className="text-sm text-destructive">
+            {errors.currentPassword.message}
+          </p>
         )}
       </div>
 
@@ -65,10 +68,13 @@ export function ChangePasswordForm() {
           type="password"
           autoComplete="new-password"
           aria-invalid={Boolean(errors.newPassword)}
+          aria-describedby={errors.newPassword ? "newPassword-error" : undefined}
           {...register("newPassword")}
         />
         {errors.newPassword && (
-          <p className="text-sm text-destructive">{errors.newPassword.message}</p>
+          <p id="newPassword-error" className="text-sm text-destructive">
+            {errors.newPassword.message}
+          </p>
         )}
       </div>
 
@@ -79,10 +85,13 @@ export function ChangePasswordForm() {
           type="password"
           autoComplete="new-password"
           aria-invalid={Boolean(errors.confirmPassword)}
+          aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
           {...register("confirmPassword")}
         />
         {errors.confirmPassword && (
-          <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
+          <p id="confirmPassword-error" className="text-sm text-destructive">
+            {errors.confirmPassword.message}
+          </p>
         )}
       </div>
 

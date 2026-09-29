@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ApiError } from "@/lib/api";
+import { ApiError, describeApiError } from "@/lib/api";
 import { useRegister } from "../hooks";
 import { registerSchema, type RegisterValues } from "../schema";
 
@@ -28,7 +28,7 @@ export function RegisterForm() {
 
   const rootError =
     registerMutation.error instanceof ApiError
-      ? registerMutation.error.message
+      ? describeApiError(registerMutation.error)
       : registerMutation.error
         ? "Something went wrong."
         : null;
@@ -37,8 +37,12 @@ export function RegisterForm() {
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
       <div className="space-y-1.5">
         <Label htmlFor="name">Name (optional)</Label>
-        <Input id="name" autoComplete="name" aria-invalid={Boolean(errors.name)} {...register("name")} />
-        {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+        <Input id="name" autoComplete="name" aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? "name-error" : undefined} {...register("name")} />
+        {errors.name && (
+          <p id="name-error" className="text-sm text-destructive">
+            {errors.name.message}
+          </p>
+        )}
       </div>
 
       <div className="space-y-1.5">
@@ -48,9 +52,14 @@ export function RegisterForm() {
           type="email"
           autoComplete="email"
           aria-invalid={Boolean(errors.email)}
+          aria-describedby={errors.email ? "email-error" : undefined}
           {...register("email")}
         />
-        {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+        {errors.email && (
+          <p id="email-error" className="text-sm text-destructive">
+            {errors.email.message}
+          </p>
+        )}
       </div>
 
       <div className="space-y-1.5">
@@ -60,12 +69,17 @@ export function RegisterForm() {
           type="password"
           autoComplete="new-password"
           aria-invalid={Boolean(errors.password)}
+          aria-describedby={errors.password ? "password-error" : "password-hint"}
           {...register("password")}
         />
         {errors.password ? (
-          <p className="text-sm text-destructive">{errors.password.message}</p>
+          <p id="password-error" className="text-sm text-destructive">
+            {errors.password.message}
+          </p>
         ) : (
-          <p className="text-xs text-muted-foreground">At least 8 characters.</p>
+          <p id="password-hint" className="text-xs text-muted-foreground">
+            At least 8 characters.
+          </p>
         )}
       </div>
 

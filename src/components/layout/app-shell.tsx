@@ -27,6 +27,12 @@ export function AppShell() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:shadow focus:ring-2 focus:ring-ring"
+      >
+        Skip to content
+      </a>
       <header className="border-b">
         <div className="container flex h-14 items-center justify-between gap-4">
           <div className="flex items-center gap-6">
@@ -72,7 +78,7 @@ export function AppShell() {
           </div>
         </div>
       </header>
-      <main className="container py-8">
+      <main id="main" tabIndex={-1} className="container py-8">
         <Outlet />
       </main>
     </div>

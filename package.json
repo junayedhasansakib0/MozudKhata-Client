@@ -1,6 +1,6 @@
 {
   "name": "mozudkhata-client",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "description": "MozudKhata frontend — Vite + React SPA consuming the REST API",
