@@ -3,6 +3,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { RedirectIfAuthed, RequireAuth } from "@/features/auth/route-guards";
 import { CategoriesPage } from "@/pages/categories-page";
 import { DashboardPage } from "@/pages/dashboard-page";
+import { HistoryPage } from "@/pages/history-page";
 import { LoginPage } from "@/pages/login-page";
 import { NotFoundPage } from "@/pages/not-found-page";
 import { ProductDetailPage } from "@/pages/product-detail-page";
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
           { path: "products/:id", element: <ProductDetailPage /> },
           { path: "products/:id/edit", element: <ProductEditPage /> },
           { path: "categories", element: <CategoriesPage /> },
+          { path: "history", element: <HistoryPage /> },
           { path: "profile", element: <ProfilePage /> },
           { path: "*", element: <NotFoundPage /> },
         ],
