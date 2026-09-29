@@ -75,6 +75,42 @@ async function request<T>(path: string, options: RequestInit): Promise<T> {
   return (body as SuccessEnvelope<T>).data;
 }
 
+/**
+ * Like `request` but returns the full success envelope (`data` + `meta`) for
+ * read endpoints that paginate. Reads never need CSRF, so this stays GET-only.
+ */
+export async function apiGetWithMeta<T>(
+  path: string,
+): Promise<{ data: T; meta?: Record<string, unknown> }> {
+  const url = `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch {
+    throw new ApiError("NETWORK", "Unable to reach the server.", 0, undefined);
+  }
+
+  const isJson = response.headers.get("content-type")?.includes("application/json");
+  const body: unknown = isJson ? await response.json() : undefined;
+
+  if (!response.ok) {
+    const error = (body as ErrorEnvelope | undefined)?.error;
+    throw new ApiError(
+      error?.code ?? "INTERNAL",
+      error?.message ?? "Request failed.",
+      response.status,
+      error?.details,
+    );
+  }
+
+  const envelope = body as SuccessEnvelope<T>;
+  return { data: envelope.data, meta: envelope.meta };
+}
+
 // Double-submit CSRF (docs/security.md §4). The token is kept in memory (not
 // read from the cookie, which is unreadable when the API is on another site)
 // and echoed in a header; the browser sends the matching cookie automatically.

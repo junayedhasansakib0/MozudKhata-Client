@@ -1,12 +1,13 @@
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { ApiStatus } from "@/components/api-status";
 import { Button } from "@/components/ui/button";
 import { useCurrentUser, useLogout } from "@/features/auth/hooks";
+import { cn } from "@/lib/utils";
 
 /**
  * Top-level application chrome for authenticated pages: header with brand, live
  * API status, the current user, and account/logout controls; a main region
- * where routed pages render. Feature navigation is added in later phases.
+ * where routed pages render.
  */
 export function AppShell() {
   const navigate = useNavigate();
@@ -18,13 +19,29 @@ export function AppShell() {
     navigate("/login", { replace: true });
   };
 
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    cn(
+      "text-sm transition-colors hover:text-foreground",
+      isActive ? "font-medium text-foreground" : "text-muted-foreground",
+    );
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b">
         <div className="container flex h-14 items-center justify-between gap-4">
-          <Link to="/" className="text-lg font-semibold tracking-tight">
-            MozudKhata
-          </Link>
+          <div className="flex items-center gap-6">
+            <Link to="/" className="text-lg font-semibold tracking-tight">
+              MozudKhata
+            </Link>
+            <nav className="flex items-center gap-4">
+              <NavLink to="/products" className={navLinkClass}>
+                Products
+              </NavLink>
+              <NavLink to="/categories" className={navLinkClass}>
+                Categories
+              </NavLink>
+            </nav>
+          </div>
           <div className="flex items-center gap-3">
             <ApiStatus />
             {user && (
