@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Design tokens bound to docs/UI-UX/ (semantic palette from the DESIGN.md "Colors"
+ * section + PRD). HSL channels so Tailwind can apply opacity. Light theme matches the
+ * UI-UX mockups; the dark theme is a reasonable extension to be confirmed in Phase 1.
+ */
+@layer base {
+  :root {
+    --background: 210 40% 98%; /* #F8FAFC canvas */
+    --foreground: 222 47% 11%; /* #0F172A ink */
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 217 91% 60%; /* #3B82F6 cobalt */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 47% 11%; /* #0F172A ink */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 210 40% 96%; /* #F1F5F9 */
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%; /* #EF4444 */
+    --destructive-foreground: 0 0% 100%;
+    --success: 160 84% 39%; /* #10B981 */
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%; /* #F59E0B */
+    --warning-foreground: 222 47% 11%;
+    --info: 199 89% 48%; /* #0EA5E9 */
+    --info-foreground: 0 0% 100%;
+    --brand: 243 75% 59%; /* #4F46E5 brand indigo */
+    --brand-foreground: 0 0% 100%;
+    --border: 214 32% 91%; /* #E2E8F0 hairline */
+    --input: 214 32% 91%;
+    --ring: 217 91% 60%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222 47% 7%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 98%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 160 84% 39%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 222 47% 11%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+    --brand: 243 75% 65%;
+    --brand-foreground: 0 0% 100%;
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 217 91% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    /* Tabular lining numerals for currency/qty alignment (UI-UX typography). */
+    font-feature-settings:
+      "tnum" 1,
+      "cv01" 1;
+  }
+}
