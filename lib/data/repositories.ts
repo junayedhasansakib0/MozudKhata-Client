@@ -21,11 +21,19 @@ import type {
   Product,
   ProductInput,
   ProductListParams,
+  PurchaseKpis,
+  PurchaseListParams,
+  PurchaseOrder,
+  CreatePurchaseOrderInput,
+  ReceivePurchaseInput,
   ReceiveTransferInput,
   SaleReceipt,
   StockMovement,
   StockTransfer,
   Store,
+  Supplier,
+  SupplierInput,
+  SupplierListItem,
   TaxLine,
   TaxRateConfig,
   UserSession,
@@ -123,6 +131,28 @@ export interface InventoryRepository {
   cancelTransfer(id: Id): Promise<StockTransfer>;
 }
 
+/** Supplier directory + derived purchase history and outstanding balance. */
+export interface SuppliersRepository {
+  list(): Promise<SupplierListItem[]>;
+  getById(id: Id): Promise<Supplier | null>;
+  history(id: Id): Promise<PurchaseOrder[]>;
+  create(input: SupplierInput): Promise<Supplier>;
+  update(id: Id, input: SupplierInput): Promise<Supplier>;
+  setStatus(id: Id, status: "active" | "inactive"): Promise<Supplier>;
+}
+
+/** Purchase orders: lifecycle (draft→ordered→received), receiving, payments. */
+export interface PurchasesRepository {
+  list(params?: PurchaseListParams): Promise<PurchaseOrder[]>;
+  getById(id: Id): Promise<PurchaseOrder | null>;
+  getKpis(): Promise<PurchaseKpis>;
+  create(input: CreatePurchaseOrderInput): Promise<PurchaseOrder>;
+  submit(id: Id): Promise<PurchaseOrder>;
+  receive(input: ReceivePurchaseInput): Promise<PurchaseOrder>;
+  recordPayment(id: Id, amountMinor: number): Promise<PurchaseOrder>;
+  cancel(id: Id): Promise<PurchaseOrder>;
+}
+
 export interface SignupInput {
   businessName: string;
   fullName: string;
@@ -159,4 +189,6 @@ export interface DataSource {
   readonly brands: BrandsRepository;
   readonly taxRates: TaxRatesRepository;
   readonly inventory: InventoryRepository;
+  readonly suppliers: SuppliersRepository;
+  readonly purchases: PurchasesRepository;
 }

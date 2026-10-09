@@ -521,6 +521,114 @@ export interface MovementListParams {
   type?: StockMovementType | "all";
 }
 
+// --- Purchasing & Suppliers ---
+
+export type SupplierStatus = "active" | "inactive";
+
+export interface Supplier {
+  id: Id;
+  name: string;
+  contactName?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  currencyCode: string;
+  status: SupplierStatus;
+  createdAt: string;
+}
+
+/** Supplier plus derived purchasing stats for the directory list. */
+export interface SupplierListItem extends Supplier {
+  orderCount: number;
+  outstanding: Money;
+}
+
+export interface SupplierInput {
+  name: string;
+  contactName?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  currencyCode?: string;
+  status: SupplierStatus;
+}
+
+export type PurchaseStatus =
+  | "draft"
+  | "ordered"
+  | "partially_received"
+  | "received"
+  | "cancelled";
+
+export type PurchasePaymentStatus = "unpaid" | "partial" | "paid";
+
+export interface PurchaseOrderItem {
+  variantId: Id;
+  sku: string;
+  productName: string;
+  variantName: string;
+  quantityOrdered: number;
+  quantityReceived: number;
+  unitCost: Money;
+  lineTotal: Money;
+}
+
+export interface PurchaseOrder {
+  id: Id;
+  poNumber: string;
+  supplierId: Id;
+  supplierName: string;
+  storeId: Id;
+  storeName: string;
+  status: PurchaseStatus;
+  paymentStatus: PurchasePaymentStatus;
+  expectedAt?: string;
+  orderedAt?: string;
+  receivedAt?: string;
+  subtotal: Money;
+  taxTotal: Money;
+  total: Money;
+  amountPaid: Money;
+  currency: string;
+  createdBy: string;
+  createdAt: string;
+  items: PurchaseOrderItem[];
+}
+
+export interface CreatePurchaseOrderLine {
+  variantId: Id;
+  quantityOrdered: number;
+  unitCostMinor: number;
+}
+
+export interface CreatePurchaseOrderInput {
+  supplierId: Id;
+  storeId: Id;
+  expectedAt?: string;
+  /** Tax fraction applied to the subtotal (e.g. 0.0825). Defaults to 0. */
+  taxRate?: number;
+  items: CreatePurchaseOrderLine[];
+}
+
+export interface ReceivePurchaseInput {
+  id: Id;
+  lines: { variantId: Id; quantityReceived: number }[];
+}
+
+export interface PurchaseListParams {
+  q?: string;
+  status?: PurchaseStatus | "all";
+  supplierId?: Id;
+  storeId?: Id;
+}
+
+export interface PurchaseKpis {
+  openOrders: number;
+  awaitingReceipt: number;
+  outstandingPayables: Money;
+  spendThisPeriod: Money;
+}
+
 export interface ReceiptLine {
   name: string;
   quantity: number;

@@ -34,6 +34,22 @@ import {
   receiveTransfer,
   shipTransfer,
 } from "./inventory";
+import {
+  cancelPurchaseOrder,
+  createPurchaseOrder,
+  createSupplier,
+  getPurchaseOrder,
+  getSupplier,
+  listPurchaseOrders,
+  listSuppliers,
+  purchaseKpis,
+  receivePurchase,
+  recordPurchasePayment,
+  setSupplierStatus,
+  submitPurchaseOrder,
+  supplierHistory,
+  updateSupplier,
+} from "./purchasing";
 import { seedActiveStoreId, seedNotifications, seedStores, seedTenant, seedUser } from "./seed";
 
 // Simulate network latency in the browser so loading states are visible during
@@ -289,6 +305,66 @@ export function createMockDataSource(): DataSource {
       async cancelTransfer(id) {
         await delay();
         return cancelTransfer(id);
+      },
+    },
+    suppliers: {
+      async list() {
+        await delay();
+        return listSuppliers();
+      },
+      async getById(id) {
+        await delay();
+        return getSupplier(id);
+      },
+      async history(id) {
+        await delay();
+        return supplierHistory(id);
+      },
+      async create(input) {
+        await delay();
+        return createSupplier(input);
+      },
+      async update(id, input) {
+        await delay();
+        return updateSupplier(id, input);
+      },
+      async setStatus(id, status) {
+        await delay();
+        return setSupplierStatus(id, status);
+      },
+    },
+    purchases: {
+      async list(params) {
+        await delay();
+        return listPurchaseOrders(params);
+      },
+      async getById(id) {
+        await delay();
+        return getPurchaseOrder(id);
+      },
+      async getKpis() {
+        await delay();
+        return purchaseKpis();
+      },
+      async create(input) {
+        await delay();
+        return createPurchaseOrder(input);
+      },
+      async submit(id) {
+        await delay();
+        return submitPurchaseOrder(id);
+      },
+      async receive(input) {
+        await delay();
+        return receivePurchase(input);
+      },
+      async recordPayment(id, amountMinor) {
+        await delay();
+        return recordPurchasePayment(id, amountMinor);
+      },
+      async cancel(id) {
+        await delay();
+        return cancelPurchaseOrder(id);
       },
     },
   };
