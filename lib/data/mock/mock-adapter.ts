@@ -23,6 +23,17 @@ import {
   updateBrand,
   updateCategory,
 } from "./catalog";
+import {
+  cancelTransfer,
+  createAdjustment,
+  createTransfer,
+  inventoryKpis,
+  inventoryList,
+  listMovements,
+  listTransfers,
+  receiveTransfer,
+  shipTransfer,
+} from "./inventory";
 import { seedActiveStoreId, seedNotifications, seedStores, seedTenant, seedUser } from "./seed";
 
 // Simulate network latency in the browser so loading states are visible during
@@ -240,6 +251,44 @@ export function createMockDataSource(): DataSource {
       async list() {
         await delay();
         return listTaxRates();
+      },
+    },
+    inventory: {
+      async listItems(params) {
+        await delay();
+        return inventoryList(params);
+      },
+      async getKpis({ storeId }) {
+        await delay();
+        return inventoryKpis(storeId);
+      },
+      async listMovements(params) {
+        await delay();
+        return listMovements(params);
+      },
+      async createAdjustment(input) {
+        await delay();
+        return createAdjustment(input);
+      },
+      async listTransfers(params) {
+        await delay();
+        return listTransfers(params?.storeId);
+      },
+      async createTransfer(input) {
+        await delay();
+        return createTransfer(input);
+      },
+      async shipTransfer(id) {
+        await delay();
+        return shipTransfer(id);
+      },
+      async receiveTransfer(input) {
+        await delay();
+        return receiveTransfer(input);
+      },
+      async cancelTransfer(id) {
+        await delay();
+        return cancelTransfer(id);
       },
     },
   };

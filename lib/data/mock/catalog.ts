@@ -99,12 +99,18 @@ function major(v: number) {
 }
 
 function buildVariant(productId: Id, spec: VariantSpec): ProductVariant {
-  const stockByStore: VariantStoreStock[] = STOCK_STORES.map((store, i) => ({
-    storeId: store.id,
-    storeName: store.name,
-    quantity: spec.stock[i] ?? 0,
-    binLocation: spec.bins?.[i],
-  }));
+  const stockByStore: VariantStoreStock[] = STOCK_STORES.map((store, i) => {
+    const quantity = spec.stock[i] ?? 0;
+    // Deterministic demo reservations so available ≠ on-hand on busier shelves.
+    const reserved = quantity > 30 ? 2 : quantity > 10 ? 1 : 0;
+    return {
+      storeId: store.id,
+      storeName: store.name,
+      quantity,
+      reserved,
+      binLocation: spec.bins?.[i],
+    };
+  });
   return {
     id: uid("var"),
     productId,
@@ -643,4 +649,48 @@ export function listTaxRates(): TaxRateConfig[] {
 /** Test-only: reset the mutable store between test cases. */
 export function __resetCatalog(): void {
   Object.assign(state, freshState());
+}
+
+// --- Stock accessors (shared with the inventory module) -------------------------
+
+/** Live reference to a variant and its store stock row, or null. */
+function locate(variantId: Id, storeId: Id) {
+  for (const product of state.products) {
+    const variant = product.variants.find((v) => v.id === variantId);
+    if (!variant) continue;
+    const row = variant.stockByStore.find((s) => s.storeId === storeId);
+    if (!row) return null;
+    return { product, variant, row };
+  }
+  return null;
+}
+
+export interface VariantStockSnapshot {
+  onHand: number;
+  reserved: number;
+  binLocation?: string;
+}
+
+export function findVariantStock(variantId: Id, storeId: Id): VariantStockSnapshot | null {
+  const found = locate(variantId, storeId);
+  if (!found) return null;
+  return {
+    onHand: found.row.quantity,
+    reserved: found.row.reserved ?? 0,
+    binLocation: found.row.binLocation,
+  };
+}
+
+/** Set a variant's on-hand at a store (clamped ≥ 0). Returns the new balance. */
+export function setVariantOnHand(variantId: Id, storeId: Id, onHand: number): number {
+  const found = locate(variantId, storeId);
+  if (!found) throw new ApiError("NOT_FOUND", "Stock record not found.", { status: 404 });
+  found.row.quantity = Math.max(0, Math.round(onHand));
+  found.product.updatedAt = nowIso();
+  return found.row.quantity;
+}
+
+/** All products (cloned) for inventory to flatten into stock rows. */
+export function catalogAllProducts(): Product[] {
+  return state.products.map((p) => clone(p));
 }

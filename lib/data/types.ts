@@ -238,6 +238,8 @@ export interface VariantStoreStock {
   storeId: Id;
   storeName: string;
   quantity: number;
+  /** Units committed to open orders; `quantity - reserved = available`. */
+  reserved?: number;
   binLocation?: string;
 }
 
@@ -387,6 +389,136 @@ export interface ImportPreview {
   createCount: number;
   updateCount: number;
   errorCount: number;
+}
+
+// --- Inventory & Stock Control ---
+
+export type StockLevelKey = "ok" | "low" | "out";
+
+/** One stock-level row: a variant at a store (docs/database.md inventory_items). */
+export interface InventoryItem {
+  variantId: Id;
+  productId: Id;
+  productName: string;
+  variantName: string;
+  sku: string;
+  barcode?: string;
+  categoryName: string;
+  storeId: Id;
+  storeName: string;
+  onHand: number;
+  reserved: number;
+  available: number;
+  binLocation?: string;
+  reorderThreshold: number;
+  reorderQuantity: number;
+  unit: string;
+  costPrice: Money;
+  sellPrice: Money;
+  level: StockLevelKey;
+}
+
+export interface InventoryKpis {
+  valuationCost: Money;
+  valuationRetail: Money;
+  inStock: number;
+  low: number;
+  out: number;
+  inTransit: number;
+}
+
+export type StockMovementType =
+  | "sale"
+  | "sale_return"
+  | "purchase_receipt"
+  | "adjustment"
+  | "transfer_out"
+  | "transfer_in"
+  | "initial";
+
+/** Immutable, append-only ledger entry (docs/business-rules.md Stock Movements). */
+export interface StockMovement {
+  id: Id;
+  storeId: Id;
+  storeName: string;
+  variantId: Id;
+  sku: string;
+  productName: string;
+  type: StockMovementType;
+  quantityDelta: number; // signed
+  balanceAfter: number;
+  reasonCode?: string;
+  note?: string;
+  referenceType?: string;
+  referenceId?: string;
+  actor: string;
+  createdAt: string; // ISO 8601 UTC
+}
+
+export type AdjustmentType = "add" | "remove" | "exact";
+export type AdjustmentReason = "damaged" | "theft" | "recount" | "received" | "promo" | "other";
+
+export interface CreateAdjustmentInput {
+  variantId: Id;
+  storeId: Id;
+  type: AdjustmentType;
+  /** For add/remove: the delta magnitude. For exact: the counted on-hand. */
+  quantity: number;
+  reason: AdjustmentReason;
+  note?: string;
+  /** Supervisor override credential (mock accepts any non-empty value). */
+  supervisorPin: string;
+}
+
+export type TransferStatus = "draft" | "in_transit" | "received" | "cancelled";
+
+export interface TransferItem {
+  variantId: Id;
+  sku: string;
+  productName: string;
+  variantName: string;
+  quantity: number;
+  quantityReceived: number;
+}
+
+export interface StockTransfer {
+  id: Id;
+  reference: string;
+  fromStoreId: Id;
+  fromStoreName: string;
+  toStoreId: Id;
+  toStoreName: string;
+  status: TransferStatus;
+  items: TransferItem[];
+  createdBy: string;
+  createdAt: string;
+  shippedAt?: string;
+  receivedAt?: string;
+  /** True once received with any line short/over the shipped quantity. */
+  hasDiscrepancy: boolean;
+}
+
+export interface CreateTransferInput {
+  fromStoreId: Id;
+  toStoreId: Id;
+  items: { variantId: Id; quantity: number }[];
+}
+
+export interface ReceiveTransferInput {
+  id: Id;
+  received: { variantId: Id; quantityReceived: number }[];
+}
+
+export interface InventoryListParams {
+  storeId: Id;
+  q?: string;
+  level?: StockLevelKey | "all";
+}
+
+export interface MovementListParams {
+  storeId: Id;
+  variantId?: Id;
+  type?: StockMovementType | "all";
 }
 
 export interface ReceiptLine {

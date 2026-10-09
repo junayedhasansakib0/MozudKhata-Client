@@ -5,9 +5,15 @@ import type {
   BulkPriceAdjustment,
   CatalogSummary,
   Category,
+  CreateAdjustmentInput,
   CreateSaleInput,
+  CreateTransferInput,
   DashboardData,
   Id,
+  InventoryItem,
+  InventoryKpis,
+  InventoryListParams,
+  MovementListParams,
   PageResult,
   PosCategory,
   PosCustomer,
@@ -15,7 +21,10 @@ import type {
   Product,
   ProductInput,
   ProductListParams,
+  ReceiveTransferInput,
   SaleReceipt,
+  StockMovement,
+  StockTransfer,
   Store,
   TaxLine,
   TaxRateConfig,
@@ -97,6 +106,23 @@ export interface TaxRatesRepository {
   list(): Promise<TaxRateConfig[]>;
 }
 
+/**
+ * Inventory & stock control. Reads/mutates per-store stock levels, the immutable
+ * stock-movement ledger, and inter-store transfers (docs/business-rules.md Inventory /
+ * Stock Movements / Stock Transfers). Mock in Stage 1; HTTP adapter in Stage 3.
+ */
+export interface InventoryRepository {
+  listItems(params: InventoryListParams): Promise<InventoryItem[]>;
+  getKpis(params: { storeId: Id }): Promise<InventoryKpis>;
+  listMovements(params: MovementListParams): Promise<StockMovement[]>;
+  createAdjustment(input: CreateAdjustmentInput): Promise<StockMovement>;
+  listTransfers(params?: { storeId?: Id }): Promise<StockTransfer[]>;
+  createTransfer(input: CreateTransferInput): Promise<StockTransfer>;
+  shipTransfer(id: Id): Promise<StockTransfer>;
+  receiveTransfer(input: ReceiveTransferInput): Promise<StockTransfer>;
+  cancelTransfer(id: Id): Promise<StockTransfer>;
+}
+
 export interface SignupInput {
   businessName: string;
   fullName: string;
@@ -132,4 +158,5 @@ export interface DataSource {
   readonly categories: CategoriesRepository;
   readonly brands: BrandsRepository;
   readonly taxRates: TaxRatesRepository;
+  readonly inventory: InventoryRepository;
 }
