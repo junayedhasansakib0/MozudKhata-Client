@@ -326,6 +326,35 @@ export function recordPurchaseReceipt(params: {
   return balanceAfter;
 }
 
+/**
+ * Restock units returned by a refund: increase on-hand and append a sale_return
+ * movement. Returns the new balance. Used by the sales/refunds module.
+ */
+export function recordSaleReturn(params: {
+  storeId: Id;
+  variantId: Id;
+  quantity: number;
+  referenceId: string;
+}): number {
+  const ref = findVariant(params.variantId);
+  const current = findVariantStock(params.variantId, params.storeId);
+  if (!ref || !current) throw new ApiError("NOT_FOUND", "Stock record not found.", { status: 404 });
+  const balanceAfter = setVariantOnHand(params.variantId, params.storeId, current.onHand + params.quantity);
+  appendMovement({
+    storeId: params.storeId,
+    storeName: storeName(params.storeId),
+    variantId: ref.variant.id,
+    sku: ref.variant.sku,
+    productName: ref.product.name,
+    type: "sale_return",
+    quantityDelta: params.quantity,
+    balanceAfter,
+    referenceType: "refund",
+    referenceId: params.referenceId,
+  });
+  return balanceAfter;
+}
+
 export function createTransfer(input: CreateTransferInput): StockTransfer {
   if (input.fromStoreId === input.toStoreId) {
     throw new ApiError("VALIDATION_FAILED", "Source and destination must differ.", { status: 422 });

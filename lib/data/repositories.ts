@@ -25,8 +25,16 @@ import type {
   PurchaseListParams,
   PurchaseOrder,
   CreatePurchaseOrderInput,
+  CreateRefundInput,
+  Customer,
+  CustomerInput,
+  CustomerListItem,
   ReceivePurchaseInput,
   ReceiveTransferInput,
+  Refund,
+  SaleOrder,
+  SalesKpis,
+  SalesListParams,
   SaleReceipt,
   StockMovement,
   StockTransfer,
@@ -153,6 +161,24 @@ export interface PurchasesRepository {
   cancel(id: Id): Promise<PurchaseOrder>;
 }
 
+/** Customer directory + loyalty + house-credit balance. */
+export interface CustomersRepository {
+  list(): Promise<CustomerListItem[]>;
+  getById(id: Id): Promise<Customer | null>;
+  create(input: CustomerInput): Promise<Customer>;
+  update(id: Id, input: CustomerInput): Promise<Customer>;
+  setStatus(id: Id, status: "active" | "inactive"): Promise<Customer>;
+}
+
+/** Sales/orders history, invoices, and refunds. */
+export interface SalesRepository {
+  list(params?: SalesListParams): Promise<SaleOrder[]>;
+  getById(id: Id): Promise<SaleOrder | null>;
+  getKpis(params?: { storeId?: Id }): Promise<SalesKpis>;
+  listForCustomer(customerId: Id): Promise<SaleOrder[]>;
+  createRefund(input: CreateRefundInput): Promise<Refund>;
+}
+
 export interface SignupInput {
   businessName: string;
   fullName: string;
@@ -191,4 +217,6 @@ export interface DataSource {
   readonly inventory: InventoryRepository;
   readonly suppliers: SuppliersRepository;
   readonly purchases: PurchasesRepository;
+  readonly customers: CustomersRepository;
+  readonly sales: SalesRepository;
 }

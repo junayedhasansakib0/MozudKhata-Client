@@ -50,6 +50,14 @@ import {
   supplierHistory,
   updateSupplier,
 } from "./purchasing";
+import {
+  createCustomer,
+  getCustomer,
+  listCustomers,
+  setCustomerStatus,
+  updateCustomer,
+} from "./customers";
+import { createRefund, getOrder, listOrders, ordersForCustomer, salesKpis } from "./sales";
 import { seedActiveStoreId, seedNotifications, seedStores, seedTenant, seedUser } from "./seed";
 
 // Simulate network latency in the browser so loading states are visible during
@@ -365,6 +373,58 @@ export function createMockDataSource(): DataSource {
       async cancel(id) {
         await delay();
         return cancelPurchaseOrder(id);
+      },
+    },
+    customers: {
+      async list() {
+        await delay();
+        return listCustomers().map((customer) => {
+          const orders = ordersForCustomer(customer.id).filter((o) => o.status !== "voided");
+          const spent = orders.reduce((sum, o) => sum + o.total.amountMinor, 0);
+          return {
+            ...customer,
+            orderCount: orders.length,
+            totalSpent: { amountMinor: spent, currency: customer.balance.currency },
+          };
+        });
+      },
+      async getById(id) {
+        await delay();
+        return getCustomer(id);
+      },
+      async create(input) {
+        await delay();
+        return createCustomer(input);
+      },
+      async update(id, input) {
+        await delay();
+        return updateCustomer(id, input);
+      },
+      async setStatus(id, status) {
+        await delay();
+        return setCustomerStatus(id, status);
+      },
+    },
+    sales: {
+      async list(params) {
+        await delay();
+        return listOrders(params);
+      },
+      async getById(id) {
+        await delay();
+        return getOrder(id);
+      },
+      async getKpis(params) {
+        await delay();
+        return salesKpis(params?.storeId);
+      },
+      async listForCustomer(customerId) {
+        await delay();
+        return ordersForCustomer(customerId);
+      },
+      async createRefund(input) {
+        await delay();
+        return createRefund(input);
       },
     },
   };

@@ -629,6 +629,141 @@ export interface PurchaseKpis {
   spendThisPeriod: Money;
 }
 
+// --- Customers ---
+
+export type CustomerStatus = "active" | "inactive";
+
+export interface Customer {
+  id: Id;
+  name: string;
+  email?: string;
+  phone?: string;
+  loyaltyTier?: string;
+  loyaltyPoints: number;
+  creditLimit: Money;
+  balance: Money; // house-credit receivable
+  status: CustomerStatus;
+  createdAt: string;
+}
+
+export interface CustomerListItem extends Customer {
+  orderCount: number;
+  totalSpent: Money;
+}
+
+export interface CustomerInput {
+  name: string;
+  email?: string;
+  phone?: string;
+  loyaltyTier?: string;
+  creditLimitMinor?: number;
+  status: CustomerStatus;
+}
+
+// --- Sales / Orders ---
+
+export type OrderStatus = "completed" | "voided" | "refunded" | "partially_refunded" | "held";
+
+export interface SaleOrderItem {
+  id: Id;
+  variantId: Id;
+  sku: string;
+  name: string;
+  quantity: number;
+  unitPrice: Money;
+  discount: Money;
+  taxAmount: Money;
+  lineTotal: Money;
+  costPriceAtSale: Money;
+  quantityRefunded: number;
+}
+
+export interface SalePayment {
+  id: Id;
+  method: TenderMethod | "other";
+  amount: Money;
+  reference?: string;
+  createdAt: string;
+}
+
+export interface SaleOrder {
+  id: Id;
+  orderNumber: string;
+  storeId: Id;
+  storeName: string;
+  cashierName: string;
+  customerId?: Id;
+  customerName?: string;
+  status: OrderStatus;
+  subtotal: Money;
+  discountTotal: Money;
+  taxTotal: Money;
+  total: Money;
+  amountPaid: Money;
+  refundedTotal: Money;
+  currency: string;
+  completedAt?: string;
+  createdAt: string;
+  items: SaleOrderItem[];
+  payments: SalePayment[];
+}
+
+export interface SalesListParams {
+  q?: string;
+  status?: OrderStatus | "all";
+  storeId?: Id;
+  customerId?: Id;
+}
+
+export interface SalesKpis {
+  grossSales: Money;
+  orderCount: number;
+  refundsTotal: Money;
+  avgOrderValue: Money;
+}
+
+export type RefundReason =
+  | "customer_return"
+  | "damaged"
+  | "wrong_item"
+  | "price_adjustment"
+  | "other";
+
+export interface RefundLineInput {
+  orderItemId: Id;
+  quantity: number;
+}
+
+export interface CreateRefundInput {
+  orderId: Id;
+  lines: RefundLineInput[];
+  reason: RefundReason;
+  method: TenderMethod | "other";
+  restock: boolean;
+  supervisorPin: string;
+}
+
+export interface RefundItem {
+  orderItemId: Id;
+  sku: string;
+  name: string;
+  quantity: number;
+  amount: Money;
+}
+
+export interface Refund {
+  id: Id;
+  orderId: Id;
+  orderNumber: string;
+  amount: Money;
+  method: TenderMethod | "other";
+  reason: RefundReason;
+  restock: boolean;
+  createdBy: string;
+  createdAt: string;
+  items: RefundItem[];
+}
+
 export interface ReceiptLine {
   name: string;
   quantity: number;

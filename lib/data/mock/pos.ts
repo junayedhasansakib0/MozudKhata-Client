@@ -7,6 +7,7 @@ import type {
   TaxLine,
 } from "../types";
 import { seedStores, seedUser } from "./seed";
+import { recordPosOrder } from "./sales";
 
 const CATEGORIES: { id: string; name: string }[] = [
   { id: "cat_coffee", name: "Coffee & Espresso" },
@@ -152,5 +153,6 @@ export function createMockSale(input: CreateSaleInput): SaleReceipt {
     changeMinor: change,
   };
   salesByKey.set(input.idempotencyKey, receipt);
+  recordPosOrder(input, receipt);
   return receipt;
 }
