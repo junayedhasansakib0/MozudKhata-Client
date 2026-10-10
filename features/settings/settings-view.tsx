@@ -67,20 +67,47 @@ const SECTIONS: { id: SectionId; label: string; icon: React.ElementType }[] = [
   { id: "backup", label: "Backup", icon: DatabaseBackup },
 ];
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, children, id }: { label: string; children: React.ReactNode; id?: string }) {
+  const controlId =
+    id ??
+    label
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+  const control = React.isValidElement(children)
+    ? React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
+        id: (children.props as { id?: string }).id ?? controlId,
+      })
+    : children;
+
   return (
     <div className="space-y-1.5">
-      <Label className="text-label-sm uppercase tracking-wide text-muted-foreground">{label}</Label>
-      {children}
+      <Label
+        htmlFor={controlId}
+        className="text-label-sm uppercase tracking-wide text-muted-foreground"
+      >
+        {label}
+      </Label>
+      {control}
     </div>
   );
 }
 
-function Panel({ title, description, children, onSave }: { title: string; description: string; children: React.ReactNode; onSave?: () => void }) {
+function Panel({
+  title,
+  description,
+  children,
+  onSave,
+}: {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+  onSave?: () => void;
+}) {
   return (
     <Card className="p-5">
       <div className="mb-4">
-        <h2 className="font-display text-headline-sm font-semibold text-foreground">{title}</h2>
+        <h2 className="text-headline-sm font-display font-semibold text-foreground">{title}</h2>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
       <div className="space-y-4">{children}</div>
@@ -112,8 +139,10 @@ export function SettingsView() {
               onClick={() => setActive(section.id)}
               aria-current={active === section.id}
               className={cn(
-                "flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors",
-                active === section.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                "flex items-center gap-2 rounded-md px-3 py-2 text-start text-sm font-medium transition-colors",
+                active === section.id
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
               <section.icon className="size-4" />
@@ -136,11 +165,32 @@ function SettingsPanel({ section }: { section: SectionId }) {
     case "profile":
       return <ProfilePanel />;
     case "stores":
-      return <LinkPanel title="Stores" description="Manage store locations and status." href="/stores" cta="Open Stores & Branches" />;
+      return (
+        <LinkPanel
+          title="Stores"
+          description="Manage store locations and status."
+          href="/stores"
+          cta="Open Stores & Branches"
+        />
+      );
     case "users":
-      return <LinkPanel title="Users" description="Manage employees and their store scope." href="/staff" cta="Open Staff & Roles" />;
+      return (
+        <LinkPanel
+          title="Users"
+          description="Manage employees and their store scope."
+          href="/staff"
+          cta="Open Staff & Roles"
+        />
+      );
     case "roles":
-      return <LinkPanel title="Roles & permissions" description="Edit the RBAC permission matrix." href="/staff" cta="Open permission matrix" />;
+      return (
+        <LinkPanel
+          title="Roles & permissions"
+          description="Edit the RBAC permission matrix."
+          href="/staff"
+          cta="Open permission matrix"
+        />
+      );
     case "currency":
       return <CurrencyPanel />;
     case "tax":
@@ -164,7 +214,17 @@ function SettingsPanel({ section }: { section: SectionId }) {
   }
 }
 
-function LinkPanel({ title, description, href, cta }: { title: string; description: string; href: string; cta: string }) {
+function LinkPanel({
+  title,
+  description,
+  href,
+  cta,
+}: {
+  title: string;
+  description: string;
+  href: string;
+  cta: string;
+}) {
   return (
     <Panel title={title} description={description}>
       <Button asChild variant="outline">
@@ -177,7 +237,11 @@ function LinkPanel({ title, description, href, cta }: { title: string; descripti
 function BusinessPanel() {
   const { data: session } = useSession();
   return (
-    <Panel title="Business" description="Your organization's identity and base configuration." onSave={() => toast.success("Business settings saved")}>
+    <Panel
+      title="Business"
+      description="Your organization's identity and base configuration."
+      onSave={() => toast.success("Business settings saved — preview only, not persisted")}
+    >
       <Field label="Business name">
         <Input key={session?.tenant.name} defaultValue={session?.tenant.name ?? ""} />
       </Field>
@@ -196,7 +260,11 @@ function BusinessPanel() {
 function ProfilePanel() {
   const { data: session } = useSession();
   return (
-    <Panel title="Profile" description="Your personal account details." onSave={() => toast.success("Profile saved")}>
+    <Panel
+      title="Profile"
+      description="Your personal account details."
+      onSave={() => toast.success("Profile saved — preview only, not persisted")}
+    >
       <Field label="Full name">
         <Input key={session?.user.fullName} defaultValue={session?.user.fullName ?? ""} />
       </Field>
@@ -211,7 +279,11 @@ function CurrencyPanel() {
   const [symbolPos, setSymbolPos] = React.useState("prefix");
   const [grouping, setGrouping] = React.useState("comma");
   return (
-    <Panel title="Currency & format" description="How monetary amounts are displayed (amounts stay in minor units)." onSave={() => toast.success("Currency format saved")}>
+    <Panel
+      title="Currency & format"
+      description="How monetary amounts are displayed (amounts stay in minor units)."
+      onSave={() => toast.success("Currency format saved — preview only, not persisted")}
+    >
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Symbol position">
           <NativeSelect value={symbolPos} onChange={(e) => setSymbolPos(e.target.value)}>
@@ -226,7 +298,9 @@ function CurrencyPanel() {
           </NativeSelect>
         </Field>
       </div>
-      <p className="text-sm text-muted-foreground">Preview: {formatMoney({ amountMinor: 123456, currency: "USD" })}</p>
+      <p className="text-sm text-muted-foreground">
+        Preview: {formatMoney({ amountMinor: 123456, currency: "USD" })}
+      </p>
     </Panel>
   );
 }
@@ -239,11 +313,15 @@ function TaxPanel() {
         {(rates ?? []).map((rate) => (
           <li key={rate.id} className="flex items-center justify-between p-3 text-sm">
             <span className="text-foreground">{rate.name}</span>
-            <span className="font-mono text-code-sku text-muted-foreground">{(rate.rate * 100).toFixed(3)}%</span>
+            <span className="text-code-sku font-mono text-muted-foreground">
+              {(rate.rate * 100).toFixed(3)}%
+            </span>
           </li>
         ))}
       </ul>
-      <p className="text-xs text-muted-foreground">Tax-inclusive vs. exclusive pricing is a backend configuration decision.</p>
+      <p className="text-xs text-muted-foreground">
+        Tax-inclusive vs. exclusive pricing is a backend configuration decision.
+      </p>
     </Panel>
   );
 }
@@ -252,7 +330,11 @@ function InvoicePanel() {
   const [prefix, setPrefix] = React.useState("INV-");
   const [footer, setFooter] = React.useState("Thank you for your business!");
   return (
-    <Panel title="Invoice" description="Invoice numbering and receipt footer." onSave={() => toast.success("Invoice settings saved")}>
+    <Panel
+      title="Invoice"
+      description="Invoice numbering and receipt footer."
+      onSave={() => toast.success("Invoice settings saved — preview only, not persisted")}
+    >
       <Field label="Number prefix">
         <Input value={prefix} onChange={(e) => setPrefix(e.target.value)} className="font-mono" />
       </Field>
@@ -275,7 +357,11 @@ function PaymentsPanel() {
     </label>
   );
   return (
-    <Panel title="Payments" description="Accepted tender types. Processor keys live only on the backend." onSave={() => toast.success("Payment methods saved")}>
+    <Panel
+      title="Payments"
+      description="Accepted tender types. Processor keys live only on the backend."
+      onSave={() => toast.success("Payment methods saved — preview only, not persisted")}
+    >
       {row("Cash", cash, setCash)}
       {row("Card (EMV/NFC)", card, setCard)}
       {row("QR wallet", qr, setQr)}
@@ -295,7 +381,11 @@ function NotificationsPanel() {
     </label>
   );
   return (
-    <Panel title="Notifications" description="Which alerts you receive." onSave={() => toast.success("Notification preferences saved")}>
+    <Panel
+      title="Notifications"
+      description="Which alerts you receive."
+      onSave={() => toast.success("Notification preferences saved — preview only, not persisted")}
+    >
       {row("Low-stock alerts", lowStock, setLowStock)}
       {row("Reorder draft ready", reorder, setReorder)}
       {row("Shift reconciliation", shift, setShift)}
@@ -315,10 +405,13 @@ function SecurityPanel() {
     setCurrent("");
     setNext("");
     setConfirm("");
-    toast.success("Password updated");
+    toast.success("Password updated — preview only, not persisted");
   }
   return (
-    <Panel title="Security" description="Change your password. MFA for admins is planned (Phase 2).">
+    <Panel
+      title="Security"
+      description="Change your password. MFA for admins is planned (Phase 2)."
+    >
       <Field label="Current password">
         <Input type="password" value={current} onChange={(e) => setCurrent(e.target.value)} />
       </Field>
@@ -349,7 +442,9 @@ function AppearancePanel() {
             onClick={() => setTheme(option)}
             className={cn(
               "flex-1 rounded-lg border p-3 text-sm font-medium capitalize transition-colors",
-              (theme ?? "system") === option ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:bg-muted",
+              (theme ?? "system") === option
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border text-muted-foreground hover:bg-muted",
             )}
           >
             {option}
@@ -363,8 +458,18 @@ function AppearancePanel() {
 function LanguagePanel() {
   const [lang, setLang] = React.useState("en-US");
   const [rtl, setRtl] = React.useState(false);
+  React.useEffect(() => {
+    document.documentElement.dir = rtl ? "rtl" : "ltr";
+    return () => {
+      document.documentElement.dir = "ltr";
+    };
+  }, [rtl]);
   return (
-    <Panel title="Language" description="Interface language and layout direction." onSave={() => toast.success("Language saved")}>
+    <Panel
+      title="Language"
+      description="Interface language and layout direction."
+      onSave={() => toast.success("Language saved — preview only, not persisted")}
+    >
       <Field label="Language">
         <NativeSelect value={lang} onChange={(e) => setLang(e.target.value)}>
           <option value="en-US">English (US)</option>
@@ -385,14 +490,20 @@ function IntegrationsPanel() {
   return (
     <Panel title="Integrations" description="Connect hardware and third-party services.">
       <ul className="divide-y divide-border rounded-lg border border-border text-sm">
-        {["Receipt printer", "Barcode scanner", "Card terminal", "Accounting export"].map((name) => (
-          <li key={name} className="flex items-center justify-between p-3">
-            <span className="text-foreground">{name}</span>
-            <Button variant="outline" size="sm" onClick={() => toast.success(`${name} — connection flow is a backend concern`)}>
-              Connect
-            </Button>
-          </li>
-        ))}
+        {["Receipt printer", "Barcode scanner", "Card terminal", "Accounting export"].map(
+          (name) => (
+            <li key={name} className="flex items-center justify-between p-3">
+              <span className="text-foreground">{name}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => toast.success(`${name} — connection flow is a backend concern`)}
+              >
+                Connect
+              </Button>
+            </li>
+          ),
+        )}
       </ul>
     </Panel>
   );
@@ -402,9 +513,13 @@ function BackupPanel() {
   return (
     <Panel title="Backup" description="Data export and backup cadence (managed by the platform).">
       <p className="text-sm text-muted-foreground">
-        Backups are configured on the database provider. Export your catalog and sales from their respective pages.
+        Backups are configured on the database provider. Export your catalog and sales from their
+        respective pages.
       </p>
-      <Button variant="outline" onClick={() => toast.success("Backup requested")}>
+      <Button
+        variant="outline"
+        onClick={() => toast.success("Backup export is a prototype — no file is produced")}
+      >
         Request a backup
       </Button>
     </Panel>

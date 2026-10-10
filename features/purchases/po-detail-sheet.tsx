@@ -1,10 +1,19 @@
 "use client";
 
+import * as React from "react";
 import { toast } from "sonner";
 import { Ban, PackageCheck, Send, Wallet } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Sheet,
   SheetContent,
@@ -25,7 +34,10 @@ import type { PurchaseOrder, PurchasePaymentStatus, PurchaseStatus } from "@/lib
 import { formatDate, formatMoney } from "@/lib/format";
 import { usePurchaseMutations } from "./use-purchases";
 
-const STATUS_VARIANT: Record<PurchaseStatus, "secondary" | "info" | "warning" | "success" | "outline"> = {
+const STATUS_VARIANT: Record<
+  PurchaseStatus,
+  "secondary" | "info" | "warning" | "success" | "outline"
+> = {
   draft: "secondary",
   ordered: "info",
   partially_received: "warning",
@@ -47,8 +59,15 @@ interface PoDetailSheetProps {
   onRecordPayment: (order: PurchaseOrder) => void;
 }
 
-export function PoDetailSheet({ open, onOpenChange, order, onReceive, onRecordPayment }: PoDetailSheetProps) {
+export function PoDetailSheet({
+  open,
+  onOpenChange,
+  order,
+  onReceive,
+  onRecordPayment,
+}: PoDetailSheetProps) {
   const { submit, cancel } = usePurchaseMutations();
+  const [confirmCancel, setConfirmCancel] = React.useState(false);
 
   async function doSubmit() {
     if (!order) return;
@@ -65,6 +84,7 @@ export function PoDetailSheet({ open, onOpenChange, order, onReceive, onRecordPa
     try {
       await cancel.mutateAsync(order.id);
       toast.success(`${order.poNumber} cancelled`);
+      setConfirmCancel(false);
       onOpenChange(false);
     } catch (error) {
       toast.error(toUserMessage(error));
@@ -73,22 +93,28 @@ export function PoDetailSheet({ open, onOpenChange, order, onReceive, onRecordPa
 
   const canReceive = order?.status === "ordered" || order?.status === "partially_received";
   const canPay =
-    order !== null && order.status !== "cancelled" && order.amountPaid.amountMinor < order.total.amountMinor;
+    order !== null &&
+    order.status !== "cancelled" &&
+    order.amountPaid.amountMinor < order.total.amountMinor;
   const canCancel =
-    order?.status === "draft" || order?.status === "ordered" || order?.status === "partially_received";
+    order?.status === "draft" ||
+    order?.status === "ordered" ||
+    order?.status === "partially_received";
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-2xl">
         {order ? (
           <>
-            <SheetHeader className="border-b border-border bg-muted/40 p-5 text-left">
+            <SheetHeader className="border-b border-border bg-muted/40 p-5 text-start">
               <SheetTitle>{order.poNumber}</SheetTitle>
               <SheetDescription>
                 {order.supplierName} · {order.storeName}
               </SheetDescription>
               <div className="flex flex-wrap items-center gap-2 pt-1">
-                <Badge variant={STATUS_VARIANT[order.status]}>{order.status.replace("_", " ")}</Badge>
+                <Badge variant={STATUS_VARIANT[order.status]}>
+                  {order.status.replace("_", " ")}
+                </Badge>
                 <Badge variant={PAYMENT_VARIANT[order.paymentStatus]}>{order.paymentStatus}</Badge>
                 {order.expectedAt ? (
                   <span className="text-label-sm text-muted-foreground">
@@ -106,18 +132,24 @@ export function PoDetailSheet({ open, onOpenChange, order, onReceive, onRecordPa
                       <TableHead>Item</TableHead>
                       <TableHead className="text-center">Ordered</TableHead>
                       <TableHead className="text-center">Received</TableHead>
-                      <TableHead className="text-right">Unit cost</TableHead>
-                      <TableHead className="text-right">Line total</TableHead>
+                      <TableHead className="text-end">Unit cost</TableHead>
+                      <TableHead className="text-end">Line total</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {order.items.map((item) => (
                       <TableRow key={item.variantId}>
                         <TableCell>
-                          <span className="text-sm font-medium text-foreground">{item.productName}</span>
-                          <span className="block font-mono text-code-sku text-muted-foreground">{item.sku}</span>
+                          <span className="text-sm font-medium text-foreground">
+                            {item.productName}
+                          </span>
+                          <span className="text-code-sku block font-mono text-muted-foreground">
+                            {item.sku}
+                          </span>
                         </TableCell>
-                        <TableCell className="text-center tabular-nums">{item.quantityOrdered}</TableCell>
+                        <TableCell className="text-center tabular-nums">
+                          {item.quantityOrdered}
+                        </TableCell>
                         <TableCell className="text-center tabular-nums">
                           <span
                             className={
@@ -131,10 +163,10 @@ export function PoDetailSheet({ open, onOpenChange, order, onReceive, onRecordPa
                             {item.quantityReceived}
                           </span>
                         </TableCell>
-                        <TableCell className="text-right font-mono text-code-sku text-muted-foreground">
+                        <TableCell className="text-code-sku text-end font-mono text-muted-foreground">
                           {formatMoney(item.unitCost)}
                         </TableCell>
-                        <TableCell className="text-right font-mono text-code-sku text-foreground">
+                        <TableCell className="text-code-sku text-end font-mono text-foreground">
                           {formatMoney(item.lineTotal)}
                         </TableCell>
                       </TableRow>
@@ -153,7 +185,11 @@ export function PoDetailSheet({ open, onOpenChange, order, onReceive, onRecordPa
 
             <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border bg-muted/40 p-4">
               {canCancel ? (
-                <Button variant="ghost" onClick={doCancel} disabled={cancel.isPending}>
+                <Button
+                  variant="ghost"
+                  onClick={() => setConfirmCancel(true)}
+                  disabled={cancel.isPending}
+                >
                   <Ban className="size-4" />
                   Cancel
                 </Button>
@@ -180,6 +216,30 @@ export function PoDetailSheet({ open, onOpenChange, order, onReceive, onRecordPa
           </>
         ) : null}
       </SheetContent>
+      <Dialog open={confirmCancel} onOpenChange={setConfirmCancel}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel this purchase order?</DialogTitle>
+            <DialogDescription>
+              {order
+                ? `${order.poNumber} to ${order.supplierName} will be cancelled in the mock ledger. Received stock is not reversed. This cannot be undone.`
+                : ""}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmCancel(false)}
+              disabled={cancel.isPending}
+            >
+              Keep order
+            </Button>
+            <Button variant="destructive" onClick={doCancel} disabled={cancel.isPending}>
+              {cancel.isPending ? "Cancelling…" : "Cancel order"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Sheet>
   );
 }
@@ -188,7 +248,13 @@ function Row({ label, value, strong = false }: { label: string; value: string; s
   return (
     <div className="flex items-center justify-between">
       <dt className="text-muted-foreground">{label}</dt>
-      <dd className={strong ? "font-display text-headline-sm font-bold tabular-nums text-foreground" : "font-mono text-code-sku text-foreground"}>
+      <dd
+        className={
+          strong
+            ? "text-headline-sm font-display font-bold tabular-nums text-foreground"
+            : "text-code-sku font-mono text-foreground"
+        }
+      >
         {value}
       </dd>
     </div>

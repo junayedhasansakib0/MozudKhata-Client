@@ -3,7 +3,13 @@
 import * as React from "react";
 import { Search, UserRound } from "lucide-react";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import type { PosCustomer } from "@/lib/data/types";
 import { usePosCustomers } from "./use-pos-data";
@@ -24,6 +30,9 @@ export function CustomerDialog({ open, onOpenChange, onSelect, hasCustomer }: Cu
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Assign customer</DialogTitle>
+          <DialogDescription className="sr-only">
+            Search for a customer by name or phone to attach to this sale.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           <div className="flex items-center gap-2 rounded-md border border-border px-3">
@@ -33,6 +42,7 @@ export function CustomerDialog({ open, onOpenChange, onSelect, hasCustomer }: Cu
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search name or phone"
+              aria-label="Search customers"
               className="h-10 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             />
           </div>

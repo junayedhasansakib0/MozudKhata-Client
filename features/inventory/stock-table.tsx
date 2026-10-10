@@ -49,14 +49,14 @@ export function StockTable({ items, onAdjust }: StockTableProps) {
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
             <TableHead className="min-w-[240px]">Product &amp; SKU</TableHead>
-            <TableHead className="text-right">On-hand</TableHead>
-            <TableHead className="text-right">Reserved</TableHead>
-            <TableHead className="text-right">Available</TableHead>
-            <TableHead className="text-right">Cost / retail</TableHead>
-            <TableHead className="text-right">Valuation</TableHead>
+            <TableHead className="text-end">On-hand</TableHead>
+            <TableHead className="text-end">Reserved</TableHead>
+            <TableHead className="text-end">Available</TableHead>
+            <TableHead className="text-end">Cost / retail</TableHead>
+            <TableHead className="text-end">Valuation</TableHead>
             <TableHead className="text-center">Reorder</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="text-end">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -76,17 +76,17 @@ export function StockTable({ items, onAdjust }: StockTableProps) {
                     </span>
                   </div>
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-end">
                   <span className="font-semibold tabular-nums text-foreground">{item.onHand}</span>{" "}
                   <span className="text-xs text-muted-foreground">{item.unit}</span>
                 </TableCell>
-                <TableCell className="text-right font-mono text-code-sku text-muted-foreground">
+                <TableCell className="text-end font-mono text-code-sku text-muted-foreground">
                   {item.reserved}
                 </TableCell>
-                <TableCell className="text-right font-mono text-code-sku font-semibold text-primary">
+                <TableCell className="text-end font-mono text-code-sku font-semibold text-primary">
                   {item.available}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-end">
                   <div className="flex flex-col items-end">
                     <span className="font-mono text-code-sku text-foreground">
                       {money(item.costPrice.amountMinor, currency)}
@@ -96,7 +96,7 @@ export function StockTable({ items, onAdjust }: StockTableProps) {
                     </span>
                   </div>
                 </TableCell>
-                <TableCell className="text-right font-mono text-code-sku font-semibold text-foreground">
+                <TableCell className="text-end font-mono text-code-sku font-semibold text-foreground">
                   {money(item.onHand * item.costPrice.amountMinor, currency)}
                 </TableCell>
                 <TableCell className="text-center font-mono text-code-sku text-muted-foreground">
@@ -105,7 +105,7 @@ export function StockTable({ items, onAdjust }: StockTableProps) {
                 <TableCell>
                   <LevelBadge level={item.level} />
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-end">
                   <Button variant="outline" size="sm" onClick={() => onAdjust(item)}>
                     <SlidersHorizontal className="size-4" />
                     Adjust

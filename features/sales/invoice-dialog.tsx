@@ -27,11 +27,13 @@ export function InvoiceDialog({ open, onOpenChange, order }: InvoiceDialogProps)
         <DialogHeader>
           <DialogTitle>Invoice {order?.orderNumber}</DialogTitle>
           <DialogDescription>
-            {order ? `${order.storeName} · ${formatDate(order.createdAt, undefined, { dateStyle: "medium", timeStyle: "short" })}` : ""}
+            {order
+              ? `${order.storeName} · ${formatDate(order.createdAt, undefined, { dateStyle: "medium", timeStyle: "short" })}`
+              : ""}
           </DialogDescription>
         </DialogHeader>
         {order ? (
-          <div className="space-y-4 rounded-lg border border-border bg-card p-4 font-mono text-code-sku">
+          <div className="text-code-sku space-y-4 rounded-lg border border-border bg-card p-4 font-mono">
             <div className="flex justify-between text-muted-foreground">
               <span>Cashier: {order.cashierName}</span>
               <span>{order.customerName ?? "Walk-in"}</span>
@@ -71,7 +73,13 @@ export function InvoiceDialog({ open, onOpenChange, order }: InvoiceDialogProps)
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Close
           </Button>
-          <Button onClick={() => toast.success(`Invoice ${order?.orderNumber} sent to printer`)}>
+          <Button
+            onClick={() =>
+              toast.success(
+                `Invoice ${order?.orderNumber} prepared — printing is a prototype preview`,
+              )
+            }
+          >
             Print / send
           </Button>
         </DialogFooter>

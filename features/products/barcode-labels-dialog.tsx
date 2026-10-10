@@ -39,12 +39,17 @@ export function BarcodeLabelsDialog({ open, onOpenChange, products }: BarcodeLab
       name: p.variants.length > 1 ? `${p.name} — ${v.variantName}` : p.name,
       sku: v.sku,
       barcode: v.barcode ?? v.sku,
-      price: formatMoney({ amountMinor: v.sellPrice.amountMinor, currency: v.sellPrice.currency } satisfies Money),
+      price: formatMoney({
+        amountMinor: v.sellPrice.amountMinor,
+        currency: v.sellPrice.currency,
+      } satisfies Money),
     })),
   );
 
   function print() {
-    toast.success(`${labels.length} barcode ${labels.length === 1 ? "label" : "labels"} queued to the label printer`);
+    toast.success(
+      `${labels.length} barcode ${labels.length === 1 ? "label" : "labels"} prepared — label printing is a prototype preview`,
+    );
     onOpenChange(false);
   }
 
@@ -60,11 +65,16 @@ export function BarcodeLabelsDialog({ open, onOpenChange, products }: BarcodeLab
         </DialogHeader>
         <div className="grid max-h-[50vh] grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3">
           {labels.map((label) => (
-            <div key={label.key} className="rounded-md border border-border bg-card p-2 text-center">
+            <div
+              key={label.key}
+              className="rounded-md border border-border bg-card p-2 text-center"
+            >
               <p className="truncate text-xs font-medium text-foreground" title={label.name}>
                 {label.name}
               </p>
-              <p className="font-display text-sm font-bold tabular-nums text-foreground">{label.price}</p>
+              <p className="font-display text-sm font-bold tabular-nums text-foreground">
+                {label.price}
+              </p>
               <div className="mt-1 flex justify-center">
                 <FauxBarcode seed={label.barcode} />
               </div>

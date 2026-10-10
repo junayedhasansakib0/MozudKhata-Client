@@ -25,11 +25,29 @@ interface CustomerFormDialogProps {
   customer: Customer | null;
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  htmlFor,
+  children,
+}: {
+  label: string;
+  htmlFor?: string;
+  children: React.ReactNode;
+}) {
+  const generatedId = React.useId();
+  const id = htmlFor ?? generatedId;
+  const control =
+    !htmlFor && React.isValidElement(children)
+      ? React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
+          id: (children.props as { id?: string }).id ?? id,
+        })
+      : children;
   return (
     <div className="space-y-1.5">
-      <Label className="text-label-sm uppercase tracking-wide text-muted-foreground">{label}</Label>
-      {children}
+      <Label htmlFor={id} className="text-label-sm uppercase tracking-wide text-muted-foreground">
+        {label}
+      </Label>
+      {control}
     </div>
   );
 }
@@ -83,7 +101,11 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
         </DialogHeader>
         <div className="space-y-4">
           <Field label="Name *">
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Customer name" />
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Customer name"
+            />
           </Field>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Email">
@@ -95,18 +117,23 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Loyalty tier">
-              <Input value={tier} onChange={(e) => setTier(e.target.value)} placeholder="e.g. VIP Tier 2" />
+              <Input
+                value={tier}
+                onChange={(e) => setTier(e.target.value)}
+                placeholder="e.g. VIP Tier 2"
+              />
             </Field>
-            <Field label="Credit limit">
+            <Field label="Credit limit" htmlFor="customer-credit-limit">
               <div className="relative">
-                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                <span className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                   $
                 </span>
                 <Input
+                  id="customer-credit-limit"
                   value={creditLimit}
                   onChange={(e) => setCreditLimit(e.target.value)}
                   inputMode="decimal"
-                  className="pl-7 font-mono"
+                  className="ps-7 font-mono"
                 />
               </div>
             </Field>

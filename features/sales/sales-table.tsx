@@ -39,8 +39,8 @@ export function SalesTable({ orders, onOpen }: SalesTableProps) {
             <TableHead className="text-center">Items</TableHead>
             <TableHead>Payment</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className="text-right">Total</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="text-end">Total</TableHead>
+            <TableHead className="text-end">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -50,7 +50,7 @@ export function SalesTable({ orders, onOpen }: SalesTableProps) {
                 <button
                   type="button"
                   onClick={() => onOpen(order)}
-                  className="text-left font-mono text-code-sku font-semibold text-foreground hover:text-primary"
+                  className="text-start font-mono text-code-sku font-semibold text-foreground hover:text-primary"
                 >
                   {order.orderNumber}
                 </button>
@@ -66,10 +66,10 @@ export function SalesTable({ orders, onOpen }: SalesTableProps) {
               <TableCell>
                 <Badge variant={STATUS_VARIANT[order.status]}>{order.status.replace("_", " ")}</Badge>
               </TableCell>
-              <TableCell className="text-right font-mono text-code-sku text-foreground">
+              <TableCell className="text-end font-mono text-code-sku text-foreground">
                 {formatMoney(order.total)}
               </TableCell>
-              <TableCell className="text-right">
+              <TableCell className="text-end">
                 <Button variant="outline" size="sm" onClick={() => onOpen(order)}>
                   View
                 </Button>

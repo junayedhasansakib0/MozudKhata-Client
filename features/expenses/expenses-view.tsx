@@ -6,6 +6,14 @@ import { Pencil, Plus, Search, Trash2, Wallet } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -39,6 +47,7 @@ export function ExpensesView() {
   const [q, setQ] = React.useState("");
   const [formOpen, setFormOpen] = React.useState(false);
   const [editing, setEditing] = React.useState<Expense | null>(null);
+  const [deleting, setDeleting] = React.useState<Expense | null>(null);
 
   const expensesQuery = useExpenses({ storeId, category, q: q || undefined });
   const kpisQuery = useExpenseKpis(storeId);
@@ -49,10 +58,12 @@ export function ExpensesView() {
     setEditing(null);
     setFormOpen(true);
   }
-  async function del(id: string) {
+  async function confirmDelete() {
+    if (!deleting) return;
     try {
-      await remove.mutateAsync(id);
+      await remove.mutateAsync(deleting.id);
       toast.success("Expense removed");
+      setDeleting(null);
     } catch (error) {
       toast.error(toUserMessage(error));
     }
@@ -75,9 +86,9 @@ export function ExpensesView() {
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
-        {kpisQuery.isLoading || !kpis ? (
+        {kpisQuery.isLoading ? (
           Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 w-full" />)
-        ) : (
+        ) : !kpis ? null : (
           <>
             <Kpi label="Total (30 days)" value={formatMoney(kpis.totalThisPeriod)} icon={Wallet} />
             <Kpi
@@ -92,10 +103,21 @@ export function ExpensesView() {
 
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search expenses…" className="bg-muted pl-9" aria-label="Search expenses" />
+          <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search expenses…"
+            className="bg-muted ps-9"
+            aria-label="Search expenses"
+          />
         </div>
-        <NativeSelect value={category} onChange={(e) => setCategory(e.target.value as ExpenseCategory | "all")} aria-label="Category filter" className="sm:w-56">
+        <NativeSelect
+          value={category}
+          onChange={(e) => setCategory(e.target.value as ExpenseCategory | "all")}
+          aria-label="Category filter"
+          className="sm:w-56"
+        >
           <option value="all">All categories</option>
           {EXPENSE_CATEGORY_OPTIONS.map((c) => (
             <option key={c.value} value={c.value}>
@@ -110,7 +132,17 @@ export function ExpensesView() {
       ) : expensesQuery.isLoading ? (
         <Skeleton className="h-80 w-full" />
       ) : expenses.length === 0 ? (
-        <EmptyState icon={Wallet} title="No expenses" description="Record an expense to start tracking spend." action={<Button onClick={openCreate}><Plus className="size-4" />Record expense</Button>} />
+        <EmptyState
+          icon={Wallet}
+          title="No expenses"
+          description="Record an expense to start tracking spend."
+          action={
+            <Button onClick={openCreate}>
+              <Plus className="size-4" />
+              Record expense
+            </Button>
+          }
+        />
       ) : (
         <div className="overflow-hidden rounded-lg border border-border bg-card">
           <Table>
@@ -120,24 +152,50 @@ export function ExpensesView() {
                 <TableHead>Category</TableHead>
                 <TableHead>Store</TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-end">Amount</TableHead>
+                <TableHead className="text-end">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {expenses.map((expense) => (
                 <TableRow key={expense.id}>
-                  <TableCell className="text-xs text-muted-foreground">{formatDate(expense.spentAt)}</TableCell>
-                  <TableCell className="text-sm text-foreground">{expenseCategoryLabel(expense.category)}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{expense.storeName}</TableCell>
-                  <TableCell className="max-w-[280px] truncate text-sm text-muted-foreground">{expense.description ?? "—"}</TableCell>
-                  <TableCell className="text-right font-mono text-code-sku font-semibold text-foreground">{formatMoney(expense.amount)}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-xs text-muted-foreground">
+                    {formatDate(expense.spentAt)}
+                  </TableCell>
+                  <TableCell className="text-sm text-foreground">
+                    {expenseCategoryLabel(expense.category)}
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {expense.storeName}
+                  </TableCell>
+                  <TableCell className="max-w-[280px] truncate text-sm text-muted-foreground">
+                    {expense.description ?? "—"}
+                  </TableCell>
+                  <TableCell className="text-code-sku text-end font-mono font-semibold text-foreground">
+                    {formatMoney(expense.amount)}
+                  </TableCell>
+                  <TableCell className="text-end">
                     <div className="flex items-center justify-end gap-0.5">
-                      <Button variant="ghost" size="icon" className="size-8" onClick={() => { setEditing(expense); setFormOpen(true); }} aria-label="Edit expense">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8"
+                        onClick={() => {
+                          setEditing(expense);
+                          setFormOpen(true);
+                        }}
+                        aria-label="Edit expense"
+                      >
                         <Pencil className="size-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="size-8" onClick={() => del(expense.id)} disabled={remove.isPending} aria-label="Delete expense">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8"
+                        onClick={() => setDeleting(expense)}
+                        disabled={remove.isPending}
+                        aria-label={`Delete expense from ${formatDate(expense.spentAt)}`}
+                      >
                         <Trash2 className="size-4" />
                       </Button>
                     </div>
@@ -158,15 +216,46 @@ export function ExpensesView() {
           defaultStoreId={storeId ?? ""}
         />
       ) : null}
+      <Dialog open={deleting !== null} onOpenChange={(open) => !open && setDeleting(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete this expense?</DialogTitle>
+            <DialogDescription>
+              This removes the {deleting ? formatMoney(deleting.amount) : "selected"} expense from
+              the mock ledger. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleting(null)} disabled={remove.isPending}>
+              Keep expense
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete} disabled={remove.isPending}>
+              {remove.isPending ? "Deleting…" : "Delete expense"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
-function Kpi({ label, value, sub, icon: Icon }: { label: string; value: string; sub?: string; icon?: React.ElementType }) {
+function Kpi({
+  label,
+  value,
+  sub,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  icon?: React.ElementType;
+}) {
   return (
     <Card className="flex flex-col gap-1 p-5">
       <div className="flex items-center justify-between">
-        <span className="text-label-sm font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
+        <span className="text-label-sm font-semibold uppercase tracking-wider text-muted-foreground">
+          {label}
+        </span>
         {Icon ? <Icon className="size-4 text-muted-foreground" /> : null}
       </div>
       <span className="font-display text-2xl font-bold tabular-nums text-foreground">{value}</span>

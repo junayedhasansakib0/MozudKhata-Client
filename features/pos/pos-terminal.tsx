@@ -12,7 +12,13 @@ import { PageHeader } from "@/components/states/page-header";
 import { ErrorState } from "@/components/states/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -67,6 +73,13 @@ function PosTerminalInner() {
   const [completing, setCompleting] = React.useState(false);
   const [receipt, setReceipt] = React.useState<SaleReceipt | null>(null);
   const searchRef = React.useRef<HTMLInputElement | null>(null);
+
+  // Return the cursor to the product search after an overlay closes or the sale is
+  // reset. rAF lets Radix finish its own focus restoration first, then we override it
+  // so the cashier can immediately scan the next item (keyboard-first flow, PRD §3).
+  const focusSearch = React.useCallback(() => {
+    requestAnimationFrame(() => searchRef.current?.focus());
+  }, []);
 
   const loyaltyPct = cart.customer?.loyaltyDiscountPct ?? 0;
   const totals = computeTotals({
@@ -129,7 +142,7 @@ function PosTerminalInner() {
       setPaymentOpen(false);
       setReceiptOpen(true);
     } catch (error) {
-      toast(toUserMessage(error));
+      toast.error(toUserMessage(error));
     } finally {
       setCompleting(false);
     }
@@ -139,13 +152,17 @@ function PosTerminalInner() {
     cart.clear();
     setReceiptOpen(false);
     setReceipt(null);
+    focusSearch();
   }
 
   const anyDialogOpen = customerOpen || discountOpen || paymentOpen || receiptOpen || cartSheetOpen;
   usePosShortcuts(
     {
       onFocusSearch: () => searchRef.current?.focus(),
-      onHold: () => cart.hold(),
+      onHold: () => {
+        cart.hold();
+        focusSearch();
+      },
       onDiscount: () => cart.lines.length > 0 && setDiscountOpen(true),
       onFastCash: () => checkout(totals.totalMinor),
       onPay: () => checkout(),
@@ -266,6 +283,7 @@ function PosTerminalInner() {
           </SheetTrigger>
           <SheetContent side="right" className="w-full p-0 sm:max-w-md">
             <SheetTitle className="sr-only">Cart</SheetTitle>
+            <SheetDescription className="sr-only">Review items and take payment.</SheetDescription>
             {cartPanel}
           </SheetContent>
         </Sheet>
@@ -291,7 +309,10 @@ function PosTerminalInner() {
       {paymentOpen ? (
         <PaymentDialog
           open={paymentOpen}
-          onOpenChange={setPaymentOpen}
+          onOpenChange={(open) => {
+            setPaymentOpen(open);
+            if (!open) focusSearch();
+          }}
           totalMinor={totals.totalMinor}
           hasCustomer={Boolean(cart.customer)}
           initialCashMinor={prefillCash}
@@ -302,7 +323,10 @@ function PosTerminalInner() {
       {receiptOpen ? (
         <ReceiptDialog
           open={receiptOpen}
-          onOpenChange={setReceiptOpen}
+          onOpenChange={(open) => {
+            setReceiptOpen(open);
+            if (!open) focusSearch();
+          }}
           receipt={receipt}
           onNewSale={newSale}
         />

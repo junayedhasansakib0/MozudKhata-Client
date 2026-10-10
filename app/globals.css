@@ -15,21 +15,22 @@
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 217 91% 60%; /* #3B82F6 cobalt */
+    --primary: 211 100% 37%; /* #0058be — UI-UX token; AA (>4.5:1) with white text */
     --primary-foreground: 0 0% 100%;
     --secondary: 222 47% 11%; /* #0F172A ink */
     --secondary-foreground: 0 0% 100%;
     --muted: 210 40% 96%; /* #F1F5F9 */
-    --muted-foreground: 215 16% 47%;
+    --muted-foreground: 215 25% 34%; /* #475569 slate-600 — AA (>4.5:1) on light surfaces */
     --accent: 210 40% 96%;
     --accent-foreground: 222 47% 11%;
-    --destructive: 0 84% 60%; /* #EF4444 */
+    --destructive: 0 74% 42%; /* #b91c1c — AA as text/badge on light surfaces */
     --destructive-foreground: 0 0% 100%;
-    --success: 160 84% 39%; /* #10B981 */
+    --destructive-fill: 0 74% 42%; /* solid danger fill (white text ≥4.5:1) */
+    --success: 161 94% 24%; /* #047857 — AA emerald text on light (UI-UX pill text) */
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%; /* #F59E0B */
-    --warning-foreground: 222 47% 11%;
-    --info: 199 89% 48%; /* #0EA5E9 */
+    --warning: 26 84% 31%; /* #92400e — AA amber text on light tints */
+    --warning-foreground: 0 0% 100%;
+    --info: 201 96% 32%; /* #0369a1 — AA sky text on light */
     --info-foreground: 0 0% 100%;
     --brand: 243 75% 59%; /* #4F46E5 brand indigo */
     --brand-foreground: 0 0% 100%;
@@ -46,23 +47,24 @@
     --card-foreground: 210 40% 98%;
     --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 219 100% 85%; /* #adc6ff — UI-UX inverse-primary; AA on dark surfaces + dark text */
+    --primary-foreground: 216 100% 13%; /* #001a42 */
     --secondary: 210 40% 98%;
     --secondary-foreground: 222 47% 11%;
     --muted: 217 33% 17%;
     --muted-foreground: 215 20% 65%;
     --accent: 217 33% 17%;
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 72% 51%;
+    --destructive: 0 91% 71%; /* #f87171 — AA red text/badge on dark surfaces */
     --destructive-foreground: 0 0% 100%;
-    --success: 160 84% 39%;
+    --destructive-fill: 0 74% 42%; /* solid danger fill (white text ≥4.5:1) */
+    --success: 160 84% 39%; /* #10b981 — AA on dark surfaces */
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
+    --warning: 38 92% 50%; /* #f59e0b — AA on dark surfaces */
     --warning-foreground: 222 47% 11%;
-    --info: 199 89% 48%;
+    --info: 199 89% 48%; /* #0ea5e9 — AA on dark surfaces */
     --info-foreground: 0 0% 100%;
-    --brand: 243 75% 65%;
+    --brand: 234 89% 82%; /* #a5b4fc — lighter indigo, AA on dark surfaces */
     --brand-foreground: 0 0% 100%;
     --border: 217 33% 20%;
     --input: 217 33% 20%;
@@ -80,5 +82,21 @@
     font-feature-settings:
       "tnum" 1,
       "cv01" 1;
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }

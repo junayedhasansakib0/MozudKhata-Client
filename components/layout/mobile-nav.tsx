@@ -4,7 +4,14 @@ import * as React from "react";
 import { Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Brand } from "./brand";
 import { SidebarNav } from "./sidebar-nav";
 
@@ -21,6 +28,7 @@ export function MobileNav() {
       <SheetContent side="left" className="flex w-72 flex-col p-0">
         <SheetHeader className="flex h-16 justify-center border-b border-border px-5">
           <SheetTitle className="sr-only">Navigation</SheetTitle>
+          <SheetDescription className="sr-only">Primary application navigation.</SheetDescription>
           <Brand />
         </SheetHeader>
         <SidebarNav onNavigate={() => setOpen(false)} />

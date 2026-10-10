@@ -27,16 +27,40 @@ interface EmployeeFormDialogProps {
   stores: Store[];
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  htmlFor,
+  children,
+}: {
+  label: string;
+  htmlFor?: string;
+  children: React.ReactNode;
+}) {
+  const generatedId = React.useId();
+  const id = htmlFor ?? generatedId;
+  const control =
+    !htmlFor && React.isValidElement(children)
+      ? React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
+          id: (children.props as { id?: string }).id ?? id,
+        })
+      : children;
   return (
     <div className="space-y-1.5">
-      <Label className="text-label-sm uppercase tracking-wide text-muted-foreground">{label}</Label>
-      {children}
+      <Label htmlFor={id} className="text-label-sm uppercase tracking-wide text-muted-foreground">
+        {label}
+      </Label>
+      {control}
     </div>
   );
 }
 
-export function EmployeeFormDialog({ open, onOpenChange, employee, roles, stores }: EmployeeFormDialogProps) {
+export function EmployeeFormDialog({
+  open,
+  onOpenChange,
+  employee,
+  roles,
+  stores,
+}: EmployeeFormDialogProps) {
   const { create, update } = useStaffMutations();
   const [fullName, setFullName] = React.useState(employee?.fullName ?? "");
   const [email, setEmail] = React.useState(employee?.email ?? "");
@@ -75,14 +99,27 @@ export function EmployeeFormDialog({ open, onOpenChange, employee, roles, stores
         </DialogHeader>
         <div className="space-y-4">
           <Field label="Full name">
-            <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Employee name" />
+            <Input
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Employee name"
+            />
           </Field>
           <Field label="Email">
-            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@business.com" />
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="name@business.com"
+            />
           </Field>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Role">
-              <NativeSelect value={roleId} onChange={(e) => setRoleId(e.target.value)} aria-label="Role">
+              <NativeSelect
+                value={roleId}
+                onChange={(e) => setRoleId(e.target.value)}
+                aria-label="Role"
+              >
                 {roles.map((r) => (
                   <option key={r.id} value={r.id}>
                     {r.name}
@@ -91,7 +128,11 @@ export function EmployeeFormDialog({ open, onOpenChange, employee, roles, stores
               </NativeSelect>
             </Field>
             <Field label="Store scope">
-              <NativeSelect value={storeId} onChange={(e) => setStoreId(e.target.value)} aria-label="Store scope">
+              <NativeSelect
+                value={storeId}
+                onChange={(e) => setStoreId(e.target.value)}
+                aria-label="Store scope"
+              >
                 <option value="">All stores</option>
                 {stores.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -102,7 +143,11 @@ export function EmployeeFormDialog({ open, onOpenChange, employee, roles, stores
             </Field>
           </div>
           <Field label="Status">
-            <NativeSelect value={status} onChange={(e) => setStatus(e.target.value as Employee["status"])} className="sm:w-48">
+            <NativeSelect
+              value={status}
+              onChange={(e) => setStatus(e.target.value as Employee["status"])}
+              className="sm:w-48"
+            >
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </NativeSelect>

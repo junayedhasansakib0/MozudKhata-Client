@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/states/empty-state";
+import { ErrorState } from "@/components/states/error-state";
 import { ScrollText } from "lucide-react";
 import {
   Table,
@@ -57,7 +58,9 @@ export function MovementLedger({ storeId }: MovementLedgerProps) {
         </NativeSelect>
       </div>
 
-      {movementsQuery.isLoading ? (
+      {movementsQuery.isError ? (
+        <ErrorState error={movementsQuery.error} onRetry={() => movementsQuery.refetch()} />
+      ) : movementsQuery.isLoading ? (
         <Skeleton className="h-64 w-full" />
       ) : movements.length === 0 ? (
         <EmptyState
@@ -74,8 +77,8 @@ export function MovementLedger({ storeId }: MovementLedgerProps) {
                 <TableHead>Product</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Reason</TableHead>
-                <TableHead className="text-right">Change</TableHead>
-                <TableHead className="text-right">Balance</TableHead>
+                <TableHead className="text-end">Change</TableHead>
+                <TableHead className="text-end">Balance</TableHead>
                 <TableHead>Actor</TableHead>
               </TableRow>
             </TableHeader>
@@ -86,8 +89,10 @@ export function MovementLedger({ storeId }: MovementLedgerProps) {
                     {formatRelativeTime(movement.createdAt)}
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm font-medium text-foreground">{movement.productName}</span>
-                    <span className="block font-mono text-code-sku text-muted-foreground">
+                    <span className="text-sm font-medium text-foreground">
+                      {movement.productName}
+                    </span>
+                    <span className="text-code-sku block font-mono text-muted-foreground">
                       {movement.sku}
                     </span>
                   </TableCell>
@@ -100,7 +105,7 @@ export function MovementLedger({ storeId }: MovementLedgerProps) {
                   </TableCell>
                   <TableCell
                     className={cn(
-                      "text-right font-mono text-code-sku font-semibold",
+                      "text-code-sku text-end font-mono font-semibold",
                       movement.quantityDelta > 0
                         ? "text-success"
                         : movement.quantityDelta < 0
@@ -111,7 +116,7 @@ export function MovementLedger({ storeId }: MovementLedgerProps) {
                     {movement.quantityDelta >= 0 ? "+" : ""}
                     {movement.quantityDelta}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-code-sku tabular-nums text-foreground">
+                  <TableCell className="text-code-sku text-end font-mono tabular-nums text-foreground">
                     {movement.balanceAfter}
                   </TableCell>
                   <TableCell className="text-xs text-muted-foreground">{movement.actor}</TableCell>

@@ -4,14 +4,14 @@ import { ErrorState } from "@/components/states/error-state";
 
 export default function AppError({
   error,
-  reset,
+  retry,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
+  retry: () => void;
 }) {
   return (
     <div className="p-6">
-      <ErrorState error={error} onRetry={reset} />
+      <ErrorState error={error} onRetry={retry} />
     </div>
   );
 }

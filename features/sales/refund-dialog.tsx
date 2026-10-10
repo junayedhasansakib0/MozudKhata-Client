@@ -61,12 +61,20 @@ export function RefundDialog({ open, onOpenChange, order }: RefundDialogProps) {
         .filter((l) => l.quantity > 0)
     : [];
   const amountMinor = order ? refundAmountMinor(order, lines) : 0;
-  const canSubmit = Boolean(order) && lines.length > 0 && pin.trim().length > 0 && !refund.isPending;
+  const canSubmit =
+    Boolean(order) && lines.length > 0 && pin.trim().length > 0 && !refund.isPending;
 
   async function submit() {
     if (!order || !canSubmit) return;
     try {
-      await refund.mutateAsync({ orderId: order.id, lines, reason, method, restock, supervisorPin: pin });
+      await refund.mutateAsync({
+        orderId: order.id,
+        lines,
+        reason,
+        method,
+        restock,
+        supervisorPin: pin,
+      });
       toast.success(`Refunded ${formatMoney({ amountMinor, currency: order.currency })}`);
       onOpenChange(false);
     } catch (error) {
@@ -90,7 +98,7 @@ export function RefundDialog({ open, onOpenChange, order }: RefundDialogProps) {
                   <li key={item.id} className="flex items-center justify-between gap-3 p-3">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-foreground">{item.name}</p>
-                      <p className="font-mono text-code-sku text-muted-foreground">
+                      <p className="text-code-sku font-mono text-muted-foreground">
                         {formatMoney(item.unitPrice)} · {max} refundable
                       </p>
                     </div>
@@ -109,8 +117,17 @@ export function RefundDialog({ open, onOpenChange, order }: RefundDialogProps) {
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label className="text-label-sm uppercase tracking-wide text-muted-foreground">Reason</Label>
-                <NativeSelect value={reason} onChange={(e) => setReason(e.target.value as RefundReason)}>
+                <Label
+                  htmlFor="refund-reason"
+                  className="text-label-sm uppercase tracking-wide text-muted-foreground"
+                >
+                  Reason
+                </Label>
+                <NativeSelect
+                  id="refund-reason"
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value as RefundReason)}
+                >
                   {REASONS.map((r) => (
                     <option key={r.value} value={r.value}>
                       {r.label}
@@ -119,8 +136,17 @@ export function RefundDialog({ open, onOpenChange, order }: RefundDialogProps) {
                 </NativeSelect>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-label-sm uppercase tracking-wide text-muted-foreground">Method</Label>
-                <NativeSelect value={method} onChange={(e) => setMethod(e.target.value as TenderMethod | "other")}>
+                <Label
+                  htmlFor="refund-method"
+                  className="text-label-sm uppercase tracking-wide text-muted-foreground"
+                >
+                  Method
+                </Label>
+                <NativeSelect
+                  id="refund-method"
+                  value={method}
+                  onChange={(e) => setMethod(e.target.value as TenderMethod | "other")}
+                >
                   {METHODS.map((m) => (
                     <option key={m.value} value={m.value}>
                       {m.label}
@@ -132,12 +158,16 @@ export function RefundDialog({ open, onOpenChange, order }: RefundDialogProps) {
 
             <label className="flex items-center justify-between rounded-lg border border-border p-3 text-sm">
               <span className="font-medium text-foreground">Restock returned items</span>
-              <Switch checked={restock} onCheckedChange={setRestock} aria-label="Restock returned items" />
+              <Switch
+                checked={restock}
+                onCheckedChange={setRestock}
+                aria-label="Restock returned items"
+              />
             </label>
 
             <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3">
               <span className="text-sm text-muted-foreground">Refund amount</span>
-              <span className="font-display text-headline-sm font-bold tabular-nums text-foreground">
+              <span className="text-headline-sm font-display font-bold tabular-nums text-foreground">
                 {formatMoney({ amountMinor, currency: order.currency })}
               </span>
             </div>

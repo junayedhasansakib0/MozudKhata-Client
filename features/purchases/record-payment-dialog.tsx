@@ -60,7 +60,7 @@ export function RecordPaymentDialog({ open, onOpenChange, order }: RecordPayment
             Amount
           </Label>
           <div className="relative">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+            <span className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
               $
             </span>
             <Input

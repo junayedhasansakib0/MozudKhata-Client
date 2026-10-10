@@ -5,6 +5,7 @@ import * as React from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -61,6 +62,9 @@ export function DiscountDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Order discount</DialogTitle>
+          <DialogDescription className="sr-only">
+            Apply a percentage or flat discount to the order subtotal.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="inline-flex rounded-md border border-border p-0.5">
@@ -87,6 +91,7 @@ export function DiscountDialog({
               value={value}
               onChange={(event) => setValue(event.target.value)}
               placeholder={mode === "pct" ? "e.g. 10" : "e.g. 5.00"}
+              aria-label={mode === "pct" ? "Discount percentage" : "Discount amount"}
             />
             <span className="pointer-events-none absolute inset-y-0 end-3 flex items-center text-sm text-muted-foreground">
               {mode === "pct" ? "%" : "USD"}

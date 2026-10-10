@@ -48,7 +48,7 @@ export function SupplierDetailSheet({ open, onOpenChange, supplier, onEdit }: Su
       <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-2xl">
         {supplier ? (
           <>
-            <SheetHeader className="border-b border-border bg-muted/40 p-5 text-left">
+            <SheetHeader className="border-b border-border bg-muted/40 p-5 text-start">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1">
                   <SheetTitle>{supplier.name}</SheetTitle>
@@ -91,8 +91,8 @@ export function SupplierDetailSheet({ open, onOpenChange, supplier, onEdit }: Su
                         <TableHead>PO</TableHead>
                         <TableHead>Date</TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Total</TableHead>
-                        <TableHead className="text-right">Paid</TableHead>
+                        <TableHead className="text-end">Total</TableHead>
+                        <TableHead className="text-end">Paid</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -107,10 +107,10 @@ export function SupplierDetailSheet({ open, onOpenChange, supplier, onEdit }: Su
                           <TableCell>
                             <Badge variant={STATUS_VARIANT[po.status]}>{po.status.replace("_", " ")}</Badge>
                           </TableCell>
-                          <TableCell className="text-right font-mono text-code-sku text-foreground">
+                          <TableCell className="text-end font-mono text-code-sku text-foreground">
                             {formatMoney(po.total)}
                           </TableCell>
-                          <TableCell className="text-right font-mono text-code-sku text-muted-foreground">
+                          <TableCell className="text-end font-mono text-code-sku text-muted-foreground">
                             {formatMoney(po.amountPaid)}
                           </TableCell>
                         </TableRow>

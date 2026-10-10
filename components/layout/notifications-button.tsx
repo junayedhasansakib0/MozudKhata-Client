@@ -39,7 +39,7 @@ export function NotificationsButton() {
         >
           <Bell className="size-5" />
           {unread > 0 ? (
-            <span className="absolute right-1.5 top-1.5 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+            <span className="absolute end-1.5 top-1.5 flex size-4 items-center justify-center rounded-full bg-destructive-fill text-[10px] font-bold text-destructive-foreground">
               {unread}
             </span>
           ) : null}

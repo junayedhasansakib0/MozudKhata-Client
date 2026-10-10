@@ -28,7 +28,7 @@ export function PageHeader({ title, description, eyebrow, actions, className }: 
           <p className="max-w-2xl text-sm text-muted-foreground">{description}</p>
         ) : null}
       </div>
-      {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
+      {actions ? <div className="flex w-full shrink-0 items-center gap-2 sm:w-auto">{actions}</div> : null}
     </div>
   );
 }

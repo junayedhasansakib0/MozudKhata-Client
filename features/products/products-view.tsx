@@ -5,6 +5,14 @@ import { toast } from "sonner";
 import { Download, FolderTree, Package, Plus, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/states/empty-state";
 import { ErrorState } from "@/components/states/error-state";
@@ -27,7 +35,7 @@ import { ProductFormSheet } from "./product-form-sheet";
 import { ProductsTable } from "./products-table";
 import { useCatalogSummary, useProductMutations, useProducts } from "./use-products";
 
-type DialogKind = "none" | "price" | "category" | "labels" | "import" | "catalog";
+type DialogKind = "none" | "price" | "category" | "labels" | "import" | "catalog" | "deactivate";
 
 export function ProductsView() {
   const [filters, setFilters] = React.useState<ProductFilterValues>(DEFAULT_FILTERS);
@@ -151,6 +159,7 @@ export function ProductsView() {
     try {
       const n = await mutations.bulkDeactivate.mutateAsync([...selectedIds]);
       toast.success(`Deactivated ${n} products`);
+      setDialog("none");
       clearSelection();
     } catch (error) {
       toast.error(toUserMessage(error));
@@ -223,7 +232,7 @@ export function ProductsView() {
         onUpdatePrice={() => setDialog("price")}
         onChangeCategory={() => setDialog("category")}
         onPrintLabels={() => setDialog("labels")}
-        onDeactivate={applyBulkDeactivate}
+        onDeactivate={() => setDialog("deactivate")}
         onClear={clearSelection}
       />
 
@@ -324,9 +333,45 @@ export function ProductsView() {
         />
       ) : null}
       {dialog === "import" ? (
-        <ImportDialog open onOpenChange={(open) => !open && setDialog("none")} knownSkus={knownSkus} />
+        <ImportDialog
+          open
+          onOpenChange={(open) => !open && setDialog("none")}
+          knownSkus={knownSkus}
+        />
       ) : null}
-      <CatalogDialog open={dialog === "catalog"} onOpenChange={(open) => !open && setDialog("none")} />
+      <CatalogDialog
+        open={dialog === "catalog"}
+        onOpenChange={(open) => !open && setDialog("none")}
+      />
+      <Dialog open={dialog === "deactivate"} onOpenChange={(open) => !open && setDialog("none")}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Deactivate {selectedIds.size} {selectedIds.size === 1 ? "product" : "products"}?
+            </DialogTitle>
+            <DialogDescription>
+              Deactivated products are hidden from new sales but keep their history (soft delete in
+              the mock catalog). You can reactivate them later.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDialog("none")}
+              disabled={mutations.bulkDeactivate.isPending}
+            >
+              Keep active
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={applyBulkDeactivate}
+              disabled={mutations.bulkDeactivate.isPending}
+            >
+              {mutations.bulkDeactivate.isPending ? "Deactivating…" : "Deactivate"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

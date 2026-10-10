@@ -183,7 +183,7 @@ export function PoFormDialog({ open, onOpenChange, stores, defaultStoreId }: PoF
                     aria-label={`Quantity for ${line.label}`}
                   />
                   <div className="relative w-24">
-                    <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                    <span className="pointer-events-none absolute start-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
                       $
                     </span>
                     <Input

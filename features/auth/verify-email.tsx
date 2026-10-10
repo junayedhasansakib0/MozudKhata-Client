@@ -51,7 +51,7 @@ export function VerifyEmail({ email }: { email: string }) {
         </Button>
         <button
           type="button"
-          onClick={() => toast("Verification email resent")}
+          onClick={() => toast("Verification email resend is a prototype — no email is sent")}
           className="w-full text-center text-xs font-medium text-muted-foreground hover:text-foreground"
         >
           Resend email

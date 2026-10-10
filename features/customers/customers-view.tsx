@@ -81,12 +81,12 @@ export function CustomersView() {
       />
 
       <div className="relative max-w-md">
-        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Search customers…"
-          className="pl-9"
+          className="ps-9"
           aria-label="Search customers"
         />
       </div>
@@ -96,17 +96,30 @@ export function CustomersView() {
       ) : customersQuery.isLoading ? (
         <Skeleton className="h-80 w-full" />
       ) : filtered.length === 0 ? (
-        <EmptyState
-          icon={Users}
-          title="No customers"
-          description="Add a customer to track loyalty and house credit."
-          action={
-            <Button onClick={openCreate}>
-              <Plus className="size-4" />
-              Add customer
-            </Button>
-          }
-        />
+        q.trim() ? (
+          <EmptyState
+            icon={Users}
+            title="No customers match your search"
+            description={`Nothing matches “${q.trim()}”.`}
+            action={
+              <Button variant="outline" onClick={() => setQ("")}>
+                Clear search
+              </Button>
+            }
+          />
+        ) : (
+          <EmptyState
+            icon={Users}
+            title="No customers"
+            description="Add a customer to track loyalty and house credit."
+            action={
+              <Button onClick={openCreate}>
+                <Plus className="size-4" />
+                Add customer
+              </Button>
+            }
+          />
+        )
       ) : (
         <div className="overflow-hidden rounded-lg border border-border bg-card">
           <Table>
@@ -115,8 +128,8 @@ export function CustomersView() {
                 <TableHead>Customer</TableHead>
                 <TableHead>Tier</TableHead>
                 <TableHead className="text-center">Orders</TableHead>
-                <TableHead className="text-right">Spent</TableHead>
-                <TableHead className="text-right">Balance</TableHead>
+                <TableHead className="text-end">Spent</TableHead>
+                <TableHead className="text-end">Balance</TableHead>
                 <TableHead className="text-center">Active</TableHead>
               </TableRow>
             </TableHeader>
@@ -127,7 +140,7 @@ export function CustomersView() {
                     <button
                       type="button"
                       onClick={() => setDetail(customer)}
-                      className="text-left text-sm font-semibold text-foreground hover:text-primary"
+                      className="text-start text-sm font-semibold text-foreground hover:text-primary"
                     >
                       {customer.name}
                     </button>
@@ -145,12 +158,12 @@ export function CustomersView() {
                   <TableCell className="text-center tabular-nums text-muted-foreground">
                     {customer.orderCount}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-code-sku text-foreground">
+                  <TableCell className="text-code-sku text-end font-mono text-foreground">
                     {formatMoney(customer.totalSpent)}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     {customer.balance.amountMinor > 0 ? (
-                      <span className="font-mono text-code-sku font-semibold text-warning">
+                      <span className="text-code-sku font-mono font-semibold text-warning">
                         {formatMoney(customer.balance)}
                       </span>
                     ) : (

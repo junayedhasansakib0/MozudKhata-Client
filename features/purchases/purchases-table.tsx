@@ -45,9 +45,9 @@ export function PurchasesTable({ orders, onOpen, onReceive }: PurchasesTableProp
             <TableHead>Store</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Payment</TableHead>
-            <TableHead className="text-right">Total</TableHead>
+            <TableHead className="text-end">Total</TableHead>
             <TableHead>Expected</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="text-end">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -60,7 +60,7 @@ export function PurchasesTable({ orders, onOpen, onReceive }: PurchasesTableProp
                   <button
                     type="button"
                     onClick={() => onOpen(order)}
-                    className="text-left font-mono text-code-sku font-semibold text-foreground hover:text-primary"
+                    className="text-start font-mono text-code-sku font-semibold text-foreground hover:text-primary"
                   >
                     {order.poNumber}
                   </button>
@@ -76,13 +76,13 @@ export function PurchasesTable({ orders, onOpen, onReceive }: PurchasesTableProp
                 <TableCell>
                   <Badge variant={PAYMENT_VARIANT[order.paymentStatus]}>{order.paymentStatus}</Badge>
                 </TableCell>
-                <TableCell className="text-right font-mono text-code-sku text-foreground">
+                <TableCell className="text-end font-mono text-code-sku text-foreground">
                   {formatMoney(order.total)}
                 </TableCell>
                 <TableCell className="text-xs text-muted-foreground">
                   {order.expectedAt ? formatDate(order.expectedAt) : "—"}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-end">
                   <div className="flex items-center justify-end gap-1.5">
                     {canReceive ? (
                       <Button size="sm" onClick={() => onReceive(order)}>

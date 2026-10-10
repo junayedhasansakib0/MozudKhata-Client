@@ -40,7 +40,7 @@ export function ProductDetailSheet({ open, onOpenChange, product, onEdit }: Prod
       <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-2xl">
         {product ? (
           <>
-            <SheetHeader className="border-b border-border bg-muted/40 p-5 text-left">
+            <SheetHeader className="border-b border-border bg-muted/40 p-5 text-start">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1">
                   <SheetTitle>{product.name}</SheetTitle>
@@ -81,10 +81,10 @@ export function ProductDetailSheet({ open, onOpenChange, product, onEdit }: Prod
                     <TableRow className="bg-muted/50 hover:bg-muted/50">
                       <TableHead>Variant</TableHead>
                       <TableHead>SKU</TableHead>
-                      <TableHead className="text-right">Cost</TableHead>
-                      <TableHead className="text-right">Sell</TableHead>
-                      <TableHead className="text-right">Margin</TableHead>
-                      <TableHead className="text-right">Stock</TableHead>
+                      <TableHead className="text-end">Cost</TableHead>
+                      <TableHead className="text-end">Sell</TableHead>
+                      <TableHead className="text-end">Margin</TableHead>
+                      <TableHead className="text-end">Stock</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -99,13 +99,13 @@ export function ProductDetailSheet({ open, onOpenChange, product, onEdit }: Prod
                             {variant.sku}
                             <span className="block text-[11px]">{variant.barcode ?? "No barcode"}</span>
                           </TableCell>
-                          <TableCell className="text-right font-mono text-code-sku text-muted-foreground">
+                          <TableCell className="text-end font-mono text-code-sku text-muted-foreground">
                             {money(variant.costPrice.amountMinor, currency)}
                           </TableCell>
-                          <TableCell className="text-right font-semibold tabular-nums">
+                          <TableCell className="text-end font-semibold tabular-nums">
                             {money(variant.sellPrice.amountMinor, currency)}
                           </TableCell>
-                          <TableCell className="text-right">
+                          <TableCell className="text-end">
                             <Badge variant="success">
                               {marginPct(
                                 variant.costPrice.amountMinor,
@@ -114,7 +114,7 @@ export function ProductDetailSheet({ open, onOpenChange, product, onEdit }: Prod
                               %
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-right tabular-nums">{variantStock(variant)}</TableCell>
+                          <TableCell className="text-end tabular-nums">{variantStock(variant)}</TableCell>
                         </TableRow>
                       );
                     })}

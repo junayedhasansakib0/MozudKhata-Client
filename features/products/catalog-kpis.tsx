@@ -14,7 +14,7 @@ interface CatalogKpisProps {
 }
 
 export function CatalogKpis({ summary, loading }: CatalogKpisProps) {
-  if (loading || !summary) {
+  if (loading) {
     return (
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
@@ -23,6 +23,7 @@ export function CatalogKpis({ summary, loading }: CatalogKpisProps) {
       </div>
     );
   }
+  if (!summary) return null;
 
   const activePct =
     summary.totalProducts > 0

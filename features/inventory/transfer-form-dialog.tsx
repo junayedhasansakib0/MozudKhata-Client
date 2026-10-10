@@ -68,7 +68,10 @@ export function TransferFormDialog({
     const qty = Number(pickedQty);
     if (!Number.isFinite(qty) || qty <= 0) return;
     if (items.some((i) => i.variantId === option.id)) return;
-    setItems((prev) => [...prev, { variantId: option.id, label: option.label, quantity: pickedQty }]);
+    setItems((prev) => [
+      ...prev,
+      { variantId: option.id, label: option.label, quantity: pickedQty },
+    ]);
     setPicked("");
     setPickedQty("1");
   }
@@ -89,7 +92,11 @@ export function TransferFormDialog({
   }
 
   const canSubmit =
-    fromStoreId !== "" && toStoreId !== "" && fromStoreId !== toStoreId && items.length > 0 && !createTransfer.isPending;
+    fromStoreId !== "" &&
+    toStoreId !== "" &&
+    fromStoreId !== toStoreId &&
+    items.length > 0 &&
+    !createTransfer.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -101,8 +108,17 @@ export function TransferFormDialog({
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label className="text-label-sm uppercase tracking-wide text-muted-foreground">From</Label>
-            <NativeSelect value={fromStoreId} onChange={(e) => setFromStoreId(e.target.value)}>
+            <Label
+              htmlFor="transfer-from"
+              className="text-label-sm uppercase tracking-wide text-muted-foreground"
+            >
+              From
+            </Label>
+            <NativeSelect
+              id="transfer-from"
+              value={fromStoreId}
+              onChange={(e) => setFromStoreId(e.target.value)}
+            >
               {stores.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
@@ -111,8 +127,17 @@ export function TransferFormDialog({
             </NativeSelect>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-label-sm uppercase tracking-wide text-muted-foreground">To</Label>
-            <NativeSelect value={toStoreId} onChange={(e) => setToStoreId(e.target.value)}>
+            <Label
+              htmlFor="transfer-to"
+              className="text-label-sm uppercase tracking-wide text-muted-foreground"
+            >
+              To
+            </Label>
+            <NativeSelect
+              id="transfer-to"
+              value={toStoreId}
+              onChange={(e) => setToStoreId(e.target.value)}
+            >
               <option value="">Select destination…</option>
               {stores
                 .filter((s) => s.id !== fromStoreId)
@@ -126,9 +151,15 @@ export function TransferFormDialog({
         </div>
 
         <div className="space-y-2">
-          <Label className="text-label-sm uppercase tracking-wide text-muted-foreground">Items</Label>
+          <Label className="text-label-sm uppercase tracking-wide text-muted-foreground">
+            Items
+          </Label>
           <div className="flex gap-2">
-            <NativeSelect value={picked} onChange={(e) => setPicked(e.target.value)} aria-label="Select variant">
+            <NativeSelect
+              value={picked}
+              onChange={(e) => setPicked(e.target.value)}
+              aria-label="Select variant"
+            >
               <option value="">Select a product variant…</option>
               {variantOptions.map((o) => (
                 <option key={o.id} value={o.id}>
@@ -143,21 +174,35 @@ export function TransferFormDialog({
               className="w-20 font-mono"
               aria-label="Quantity"
             />
-            <Button type="button" variant="outline" size="icon" className="shrink-0" onClick={addItem} aria-label="Add item">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="shrink-0"
+              onClick={addItem}
+              aria-label="Add item"
+            >
               <Plus className="size-4" />
             </Button>
           </div>
           {items.length > 0 ? (
             <ul className="divide-y divide-border rounded-lg border border-border">
               {items.map((item) => (
-                <li key={item.variantId} className="flex items-center justify-between gap-2 p-2 text-sm">
+                <li
+                  key={item.variantId}
+                  className="flex items-center justify-between gap-2 p-2 text-sm"
+                >
                   <span className="min-w-0 flex-1 truncate text-foreground">{item.label}</span>
-                  <span className="font-mono text-code-sku text-muted-foreground">×{item.quantity}</span>
+                  <span className="text-code-sku font-mono text-muted-foreground">
+                    ×{item.quantity}
+                  </span>
                   <Button
                     variant="ghost"
                     size="icon"
                     className="size-8"
-                    onClick={() => setItems((prev) => prev.filter((i) => i.variantId !== item.variantId))}
+                    onClick={() =>
+                      setItems((prev) => prev.filter((i) => i.variantId !== item.variantId))
+                    }
                     aria-label="Remove item"
                   >
                     <Trash2 className="size-4" />
@@ -171,7 +216,11 @@ export function TransferFormDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={createTransfer.isPending}>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={createTransfer.isPending}
+          >
             Cancel
           </Button>
           <Button onClick={submit} disabled={!canSubmit}>

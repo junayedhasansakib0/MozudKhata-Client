@@ -2,7 +2,7 @@
 
 import { CircleCheck, Printer } from "lucide-react";
 
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import type { SaleReceipt, TenderMethod } from "@/lib/data/types";
 import { formatMoney } from "@/lib/format";
@@ -38,6 +38,9 @@ export function ReceiptDialog({ open, onOpenChange, receipt, onNewSale }: Receip
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
         <DialogTitle className="sr-only">Receipt {receipt.orderNumber}</DialogTitle>
+        <DialogDescription className="sr-only">
+          Sale completed. Print the receipt or start a new sale.
+        </DialogDescription>
         <div className="flex flex-col items-center gap-1 text-center">
           <span className="flex size-11 items-center justify-center rounded-full bg-success/10 text-success">
             <CircleCheck className="size-6" />

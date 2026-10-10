@@ -14,7 +14,7 @@ interface SalesKpisProps {
 }
 
 export function SalesKpis({ kpis, loading }: SalesKpisProps) {
-  if (loading || !kpis) {
+  if (loading) {
     return (
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
@@ -23,11 +23,25 @@ export function SalesKpis({ kpis, loading }: SalesKpisProps) {
       </div>
     );
   }
+  // Query failed (no data, not loading): defer to the page-level error state rather
+  // than holding a skeleton forever.
+  if (!kpis) return null;
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <Tile icon={TrendingUp} label="Gross sales (30d)" value={formatMoney(kpis.grossSales)} money />
+      <Tile
+        icon={TrendingUp}
+        label="Gross sales (30d)"
+        value={formatMoney(kpis.grossSales)}
+        money
+      />
       <Tile icon={ShoppingBag} label="Orders (30d)" value={formatNumber(kpis.orderCount)} />
-      <Tile icon={RotateCcw} label="Refunds (30d)" value={formatMoney(kpis.refundsTotal)} money tone={kpis.refundsTotal.amountMinor > 0 ? "warning" : "muted"} />
+      <Tile
+        icon={RotateCcw}
+        label="Refunds (30d)"
+        value={formatMoney(kpis.refundsTotal)}
+        money
+        tone={kpis.refundsTotal.amountMinor > 0 ? "warning" : "muted"}
+      />
       <Tile icon={Receipt} label="Avg order value" value={formatMoney(kpis.avgOrderValue)} money />
     </div>
   );
@@ -52,9 +66,16 @@ function Tile({
         <span className="text-label-sm font-semibold uppercase tracking-wider text-muted-foreground">
           {label}
         </span>
-        <Icon className={cn("size-4", tone === "warning" ? "text-warning" : "text-muted-foreground")} />
+        <Icon
+          className={cn("size-4", tone === "warning" ? "text-warning" : "text-muted-foreground")}
+        />
       </div>
-      <div className={cn("font-display tabular-nums text-foreground", money ? "text-2xl font-bold" : "text-kpi")}>
+      <div
+        className={cn(
+          "font-display tabular-nums text-foreground",
+          money ? "text-2xl font-bold" : "text-kpi",
+        )}
+      >
         {value}
       </div>
     </Card>

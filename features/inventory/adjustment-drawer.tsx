@@ -54,7 +54,8 @@ export function AdjustmentDrawer({ open, onOpenChange, item }: AdjustmentDrawerP
 
   const qty = Number(quantity);
   const validQty = quantity !== "" && Number.isFinite(qty) && qty >= 0;
-  const newBalance = item && validQty ? adjustmentNewBalance(type, item.onHand, qty) : item?.onHand ?? 0;
+  const newBalance =
+    item && validQty ? adjustmentNewBalance(type, item.onHand, qty) : (item?.onHand ?? 0);
   const delta = item ? newBalance - item.onHand : 0;
   const canSubmit = Boolean(item) && validQty && pin.trim().length > 0 && !adjust.isPending;
 
@@ -80,7 +81,7 @@ export function AdjustmentDrawer({ open, onOpenChange, item }: AdjustmentDrawerP
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-md">
-        <SheetHeader className="border-b border-border bg-muted/40 p-5 text-left">
+        <SheetHeader className="border-b border-border bg-muted/40 p-5 text-start">
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <SlidersHorizontal className="size-5" />
@@ -104,10 +105,13 @@ export function AdjustmentDrawer({ open, onOpenChange, item }: AdjustmentDrawerP
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-label-sm uppercase tracking-wide text-muted-foreground">
+              <Label
+                id="adj-type-label"
+                className="text-label-sm uppercase tracking-wide text-muted-foreground"
+              >
                 Adjustment type
               </Label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-2" role="group" aria-labelledby="adj-type-label">
                 {TYPES.map((t) => (
                   <button
                     key={t.value}
@@ -127,7 +131,10 @@ export function AdjustmentDrawer({ open, onOpenChange, item }: AdjustmentDrawerP
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="adj-qty" className="text-label-sm uppercase tracking-wide text-muted-foreground">
+              <Label
+                htmlFor="adj-qty"
+                className="text-label-sm uppercase tracking-wide text-muted-foreground"
+              >
                 {type === "exact" ? "Counted quantity" : "Quantity"}
               </Label>
               <Input
@@ -146,8 +153,12 @@ export function AdjustmentDrawer({ open, onOpenChange, item }: AdjustmentDrawerP
                 {newBalance} {item.unit}
                 <span
                   className={cn(
-                    "ml-2 text-xs",
-                    delta > 0 ? "text-success" : delta < 0 ? "text-destructive" : "text-muted-foreground",
+                    "ms-2 text-xs",
+                    delta > 0
+                      ? "text-success"
+                      : delta < 0
+                        ? "text-destructive"
+                        : "text-muted-foreground",
                   )}
                 >
                   ({delta >= 0 ? "+" : ""}
@@ -157,10 +168,17 @@ export function AdjustmentDrawer({ open, onOpenChange, item }: AdjustmentDrawerP
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-label-sm uppercase tracking-wide text-muted-foreground">
+              <Label
+                htmlFor="adj-reason"
+                className="text-label-sm uppercase tracking-wide text-muted-foreground"
+              >
                 Reason code
               </Label>
-              <NativeSelect value={reason} onChange={(e) => setReason(e.target.value as AdjustmentReason)}>
+              <NativeSelect
+                id="adj-reason"
+                value={reason}
+                onChange={(e) => setReason(e.target.value as AdjustmentReason)}
+              >
                 {REASONS.map((r) => (
                   <option key={r.value} value={r.value}>
                     {r.label}
@@ -170,7 +188,10 @@ export function AdjustmentDrawer({ open, onOpenChange, item }: AdjustmentDrawerP
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="adj-note" className="text-label-sm uppercase tracking-wide text-muted-foreground">
+              <Label
+                htmlFor="adj-note"
+                className="text-label-sm uppercase tracking-wide text-muted-foreground"
+              >
                 Audit note
               </Label>
               <Textarea

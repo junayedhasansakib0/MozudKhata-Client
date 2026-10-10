@@ -3,7 +3,13 @@
 import * as React from "react";
 import { Banknote, CreditCard, QrCode, Trash2, Wallet } from "lucide-react";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { SalePaymentInput, TenderMethod } from "@/lib/data/types";
@@ -54,6 +60,9 @@ export function PaymentDialog({
     ((initialCashMinor ? remaining : totalMinor) / 100).toFixed(2),
   );
 
+  const amountRef = React.useRef<HTMLInputElement | null>(null);
+  const completeRef = React.useRef<HTMLButtonElement | null>(null);
+
   function addPayment(method_: TenderMethod, amountMinor: number) {
     if (amountMinor <= 0) return;
     const next = [...payments, { method: method_, amountMinor }];
@@ -64,9 +73,22 @@ export function PaymentDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        className="sm:max-w-md"
+        onOpenAutoFocus={(event) => {
+          // When fast-cash seeds a settled payment the first DOM-focusable control is
+          // the "remove tender" button; focus the primary action (or the amount field
+          // when a tender is still due) so Enter completes the sale, never deletes it.
+          event.preventDefault();
+          if (settled) completeRef.current?.focus();
+          else amountRef.current?.focus();
+        }}
+      >
         <DialogHeader>
           <DialogTitle>Take payment</DialogTitle>
+          <DialogDescription className="sr-only">
+            Add tenders until the amount due is covered, then complete the sale.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="rounded-lg bg-muted p-4 text-center">
@@ -162,9 +184,11 @@ export function PaymentDialog({
                   $
                 </span>
                 <Input
+                  ref={amountRef}
                   inputMode="decimal"
                   value={amount}
                   onChange={(event) => setAmount(event.target.value)}
+                  aria-label="Tender amount"
                   className="ps-7"
                 />
               </div>
@@ -179,6 +203,7 @@ export function PaymentDialog({
         ) : null}
 
         <Button
+          ref={completeRef}
           className="h-12 w-full text-base"
           disabled={!settled || pending}
           onClick={() => onComplete(payments)}

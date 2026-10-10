@@ -59,12 +59,12 @@ export function ProductFilters({
   return (
     <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-3 lg:flex-row lg:items-center">
       <div className="relative flex-1">
-        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           value={values.q}
           onChange={(e) => onChange({ q: e.target.value })}
           placeholder="Search by name, SKU, barcode, or brand…"
-          className="bg-muted pl-9"
+          className="bg-muted ps-9"
           aria-label="Search catalog"
         />
       </div>

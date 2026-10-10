@@ -51,7 +51,7 @@ export function SaleDetailSheet({ open, onOpenChange, order, onInvoice, onRefund
       <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-2xl">
         {order ? (
           <>
-            <SheetHeader className="border-b border-border bg-muted/40 p-5 text-left">
+            <SheetHeader className="border-b border-border bg-muted/40 p-5 text-start">
               <SheetTitle>{order.orderNumber}</SheetTitle>
               <SheetDescription>
                 {order.storeName} · {order.customerName ?? "Walk-in"} ·{" "}
@@ -72,8 +72,8 @@ export function SaleDetailSheet({ open, onOpenChange, order, onInvoice, onRefund
                     <TableRow className="bg-muted/50 hover:bg-muted/50">
                       <TableHead>Item</TableHead>
                       <TableHead className="text-center">Qty</TableHead>
-                      <TableHead className="text-right">Unit</TableHead>
-                      <TableHead className="text-right">Total</TableHead>
+                      <TableHead className="text-end">Unit</TableHead>
+                      <TableHead className="text-end">Total</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -87,10 +87,10 @@ export function SaleDetailSheet({ open, onOpenChange, order, onInvoice, onRefund
                           </span>
                         </TableCell>
                         <TableCell className="text-center tabular-nums">{item.quantity}</TableCell>
-                        <TableCell className="text-right font-mono text-code-sku text-muted-foreground">
+                        <TableCell className="text-end font-mono text-code-sku text-muted-foreground">
                           {formatMoney(item.unitPrice)}
                         </TableCell>
-                        <TableCell className="text-right font-mono text-code-sku text-foreground">
+                        <TableCell className="text-end font-mono text-code-sku text-foreground">
                           {formatMoney(item.lineTotal)}
                         </TableCell>
                       </TableRow>

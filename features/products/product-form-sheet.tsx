@@ -96,7 +96,7 @@ export function ProductFormSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-2xl">
-        <SheetHeader className="border-b border-border bg-muted/40 p-5 text-left">
+        <SheetHeader className="border-b border-border bg-muted/40 p-5 text-start">
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <Package className="size-5" />
@@ -132,7 +132,11 @@ export function ProductFormSheet({
               <BasicInfoTab draft={draft} patch={patch} categories={categories} brands={brands} />
             </TabsContent>
             <TabsContent value="variants">
-              <VariantMatrixEditor baseSku={baseSku} variants={draft.variants} onChange={setVariants} />
+              <VariantMatrixEditor
+                baseSku={baseSku}
+                variants={draft.variants}
+                onChange={setVariants}
+              />
             </TabsContent>
             <TabsContent value="inventory">
               <InventoryTab variants={draft.variants} onChange={setVariants} />
@@ -156,10 +160,21 @@ export function ProductFormSheet({
   );
 }
 
-function Field({ label, htmlFor, children }: { label: string; htmlFor?: string; children: React.ReactNode }) {
+function Field({
+  label,
+  htmlFor,
+  children,
+}: {
+  label: string;
+  htmlFor?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={htmlFor} className="text-label-sm uppercase tracking-wide text-muted-foreground">
+      <Label
+        htmlFor={htmlFor}
+        className="text-label-sm uppercase tracking-wide text-muted-foreground"
+      >
         {label}
       </Label>
       {children}
@@ -256,36 +271,45 @@ function InventoryTab({
       <p className="text-sm text-muted-foreground">
         Reorder thresholds drive low-stock alerts and reorder drafts (per variant).
       </p>
-      {variants.map((variant, index) => (
-        <div key={variant.id ?? index} className="space-y-2 rounded-lg border border-border bg-muted/30 p-3">
-          <span className="text-sm font-semibold text-foreground">{variant.variantName || `Variant ${index + 1}`}</span>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <Field label="Unit">
-              <Input
-                value={variant.unit}
-                onChange={(e) => patchVariant(index, { unit: e.target.value })}
-                placeholder="each"
-              />
-            </Field>
-            <Field label="Low-stock level">
-              <Input
-                value={variant.reorderThreshold}
-                onChange={(e) => patchVariant(index, { reorderThreshold: e.target.value })}
-                inputMode="numeric"
-                className="font-mono"
-              />
-            </Field>
-            <Field label="Reorder quantity">
-              <Input
-                value={variant.reorderQuantity}
-                onChange={(e) => patchVariant(index, { reorderQuantity: e.target.value })}
-                inputMode="numeric"
-                className="font-mono"
-              />
-            </Field>
+      {variants.map((variant, index) => {
+        const vLabel = variant.variantName || `Variant ${index + 1}`;
+        return (
+          <div
+            key={variant.id ?? index}
+            className="space-y-2 rounded-lg border border-border bg-muted/30 p-3"
+          >
+            <span className="text-sm font-semibold text-foreground">{vLabel}</span>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+              <Field label="Unit">
+                <Input
+                  value={variant.unit}
+                  onChange={(e) => patchVariant(index, { unit: e.target.value })}
+                  placeholder="each"
+                  aria-label={`Unit for ${vLabel}`}
+                />
+              </Field>
+              <Field label="Low-stock level">
+                <Input
+                  value={variant.reorderThreshold}
+                  onChange={(e) => patchVariant(index, { reorderThreshold: e.target.value })}
+                  inputMode="numeric"
+                  className="font-mono"
+                  aria-label={`Low-stock level for ${vLabel}`}
+                />
+              </Field>
+              <Field label="Reorder quantity">
+                <Input
+                  value={variant.reorderQuantity}
+                  onChange={(e) => patchVariant(index, { reorderQuantity: e.target.value })}
+                  inputMode="numeric"
+                  className="font-mono"
+                  aria-label={`Reorder quantity for ${vLabel}`}
+                />
+              </Field>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -300,7 +324,9 @@ function TaxesTab({
   taxRates: TaxRateConfig[];
 }) {
   const first = draft.variants[0];
-  const margin = first ? marginPct(Number(first.costMajor) * 100, Number(first.sellMajor) * 100) : 0;
+  const margin = first
+    ? marginPct(Number(first.costMajor) * 100, Number(first.sellMajor) * 100)
+    : 0;
   return (
     <div className="space-y-4">
       <Field label="Tax class" htmlFor="product-tax">
@@ -319,7 +345,9 @@ function TaxesTab({
       </Field>
       <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm">
         <span className="text-muted-foreground">Estimated gross margin (first variant): </span>
-        <span className="font-semibold text-success">{Number.isFinite(margin) ? margin.toFixed(1) : "0.0"}%</span>
+        <span className="font-semibold text-success">
+          {Number.isFinite(margin) ? margin.toFixed(1) : "0.0"}%
+        </span>
       </div>
     </div>
   );

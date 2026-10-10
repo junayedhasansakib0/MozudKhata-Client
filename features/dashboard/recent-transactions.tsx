@@ -26,12 +26,12 @@ export function RecentTransactions({ data }: { data: RecentTransaction[] }) {
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-border text-left text-xs uppercase tracking-wider text-muted-foreground">
+          <tr className="border-b border-border text-start text-xs uppercase tracking-wider text-muted-foreground">
             <th className="pb-2 font-semibold">Order</th>
             <th className="pb-2 font-semibold">Customer</th>
             <th className="hidden pb-2 font-semibold sm:table-cell">Method</th>
-            <th className="pb-2 text-right font-semibold">Amount</th>
-            <th className="pb-2 text-right font-semibold">Status</th>
+            <th className="pb-2 text-end font-semibold">Amount</th>
+            <th className="pb-2 text-end font-semibold">Status</th>
           </tr>
         </thead>
         <tbody>
@@ -47,10 +47,10 @@ export function RecentTransactions({ data }: { data: RecentTransaction[] }) {
               <td className="hidden py-2.5 text-muted-foreground sm:table-cell">
                 {METHOD_LABELS[transaction.method]}
               </td>
-              <td className="py-2.5 text-right font-medium tabular-nums text-foreground">
+              <td className="py-2.5 text-end font-medium tabular-nums text-foreground">
                 {formatMoney(transaction.amount)}
               </td>
-              <td className="py-2.5 text-right">
+              <td className="py-2.5 text-end">
                 <Badge variant={STATUS_VARIANT[transaction.status]}>
                   {STATUS_LABEL[transaction.status]}
                 </Badge>

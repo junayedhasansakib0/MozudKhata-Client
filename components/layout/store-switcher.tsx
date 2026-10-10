@@ -28,12 +28,12 @@ export function StoreSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="h-9 gap-2">
-          <StoreIcon className="size-4 text-primary" />
+        <Button variant="outline" className="h-9 gap-2" aria-label="Select active store">
+          <StoreIcon aria-hidden="true" className="size-4 text-primary" />
           <span className="hidden max-w-[9rem] truncate text-sm font-semibold sm:block">
             {current?.name}
           </span>
-          <ChevronsUpDown className="size-4 opacity-50" />
+          <ChevronsUpDown aria-hidden="true" className="size-4 opacity-50" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-64">
@@ -41,7 +41,7 @@ export function StoreSwitcher() {
         <DropdownMenuSeparator />
         {session.stores.map((store) => (
           <DropdownMenuItem key={store.id} onSelect={() => setActiveStoreId(store.id)}>
-            <StoreIcon className="size-4 text-muted-foreground" />
+            <StoreIcon aria-hidden="true" className="size-4 text-muted-foreground" />
             <span className="flex-1">
               <span className="block text-sm font-medium leading-tight">{store.name}</span>
               <span className="block text-xs text-muted-foreground">

@@ -43,7 +43,9 @@ export function CategoryPills({ categories, total, active, onChange }: CategoryP
     <div className="flex flex-wrap gap-2">
       <Pill active={active === null} onClick={() => onChange(null)}>
         All Items
-        <span className="text-xs opacity-70">{total}</span>
+        <span className={cn("text-xs", active === null ? "opacity-90" : "opacity-70")}>
+          {total}
+        </span>
       </Pill>
       {categories.map((category) => (
         <Pill
@@ -52,7 +54,9 @@ export function CategoryPills({ categories, total, active, onChange }: CategoryP
           onClick={() => onChange(category.id)}
         >
           {category.name}
-          <span className="text-xs opacity-70">{category.count}</span>
+          <span className={cn("text-xs", active === category.id ? "opacity-90" : "opacity-70")}>
+            {category.count}
+          </span>
         </Pill>
       ))}
     </div>

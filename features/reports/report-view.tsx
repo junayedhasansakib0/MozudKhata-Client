@@ -86,7 +86,7 @@ export function ReportView({ reportKey, params }: ReportViewProps) {
                 <div className="h-5 flex-1 overflow-hidden rounded bg-muted">
                   <div className="h-full rounded bg-primary" style={{ width: `${Math.max((point.value / max) * 100, 2)}%` }} />
                 </div>
-                <span className="w-24 shrink-0 text-right font-mono text-code-sku tabular-nums text-foreground">
+                <span className="w-24 shrink-0 text-end font-mono text-code-sku tabular-nums text-foreground">
                   {point.value >= 1000 ? `$${(point.value / 100).toLocaleString("en-US", { maximumFractionDigits: 0 })}` : point.value}
                 </span>
               </li>

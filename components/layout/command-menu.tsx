@@ -42,13 +42,14 @@ export function CommandMenu({ className }: { className?: string }) {
     <>
       <button
         type="button"
+        aria-label="Open command menu"
         onClick={() => setOpen(true)}
         className={cn(
           "inline-flex h-9 items-center gap-2 rounded-md border border-border bg-card px-3 text-sm text-muted-foreground transition-colors hover:bg-muted",
           className,
         )}
       >
-        <Search className="size-4" />
+         <Search aria-hidden="true" className="size-4" />
         <span className="hidden sm:inline">Search…</span>
         <kbd className="ms-auto hidden items-center gap-0.5 rounded-sm border border-border bg-muted px-1.5 font-mono text-[10px] sm:inline-flex">
           ⌘K

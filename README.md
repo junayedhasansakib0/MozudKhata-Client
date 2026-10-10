@@ -54,9 +54,21 @@ HTTP adapter implementing the same contracts with no UI changes.
 
 ## Progress
 
-Built so far (Stage 1 frontend, mock data): app shell + navigation, auth & onboarding,
-executive dashboard, high-speed POS terminal, and the products & catalog module
-(variant matrix, search/filter/sort, bulk actions, CSV import/export). See
-[`../docs/implementation_plan.md`](../docs/implementation_plan.md) for the phase plan.
+**Stage 1 (frontend prototype on mock data) is complete and hardened.** All navigation
+surfaces are built against the swappable mock data-access layer: app shell + navigation,
+auth & onboarding, executive dashboard, high-speed POS terminal, products & catalog
+(variant matrix, search/filter/sort, bulk actions, CSV import/export), inventory & stock
+(adjustments, transfers, movement ledger), purchases & suppliers, sales & customers,
+expenses & reports, and staff/roles/stores/notifications/settings admin.
+
+Phase 11 (polish & hardening, 2026-10-11) closed the Stage 1 gate: WCAG AA accessibility
+and contrast (light + dark, axe-verified), keyboard-first POS, consistent
+loading/error/empty states and confirmations, and responsive layouts down to 390 px with
+an RTL smoke pass. Mock-only actions are labelled as prototype/preview in the UI — a
+successful mock checkout is **not** a persisted production sale. Verified with typecheck,
+lint, 131 unit/component tests, a clean production build, and a 94-test Playwright suite
+(including axe, console-error, responsive, RTL, and POS-keyboard checks). Next is
+**Stage 2 (backend)**. See
+[`../docs/implementation_plan.md`](../docs/implementation_plan.md) for the full phase plan.
 
 Git is managed by the human developer only.

@@ -25,11 +25,29 @@ interface StoreFormDialogProps {
   store: Store | null;
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  htmlFor,
+  children,
+}: {
+  label: string;
+  htmlFor?: string;
+  children: React.ReactNode;
+}) {
+  const generatedId = React.useId();
+  const id = htmlFor ?? generatedId;
+  const control =
+    !htmlFor && React.isValidElement(children)
+      ? React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
+          id: (children.props as { id?: string }).id ?? id,
+        })
+      : children;
   return (
     <div className="space-y-1.5">
-      <Label className="text-label-sm uppercase tracking-wide text-muted-foreground">{label}</Label>
-      {children}
+      <Label htmlFor={id} className="text-label-sm uppercase tracking-wide text-muted-foreground">
+        {label}
+      </Label>
+      {control}
     </div>
   );
 }
@@ -73,11 +91,20 @@ export function StoreFormDialog({ open, onOpenChange, store }: StoreFormDialogPr
         </DialogHeader>
         <div className="space-y-4">
           <Field label="Name">
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Store name" />
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Store name"
+            />
           </Field>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Code">
-              <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="e.g. AUS-04" className="font-mono uppercase" />
+              <Input
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder="e.g. AUS-04"
+                className="font-mono uppercase"
+              />
             </Field>
             <Field label="City">
               <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" />
@@ -85,10 +112,17 @@ export function StoreFormDialog({ open, onOpenChange, store }: StoreFormDialogPr
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Currency">
-              <Input value={currency} onChange={(e) => setCurrency(e.target.value.toUpperCase())} className="font-mono" />
+              <Input
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value.toUpperCase())}
+                className="font-mono"
+              />
             </Field>
             <Field label="Status">
-              <NativeSelect value={status} onChange={(e) => setStatus(e.target.value as Store["status"])}>
+              <NativeSelect
+                value={status}
+                onChange={(e) => setStatus(e.target.value as Store["status"])}
+              >
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </NativeSelect>

@@ -14,7 +14,7 @@ interface InventoryKpisProps {
 }
 
 export function InventoryKpis({ kpis, loading }: InventoryKpisProps) {
-  if (loading || !kpis) {
+  if (loading) {
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {Array.from({ length: 5 }).map((_, i) => (
@@ -23,6 +23,7 @@ export function InventoryKpis({ kpis, loading }: InventoryKpisProps) {
       </div>
     );
   }
+  if (!kpis) return null;
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -38,15 +39,39 @@ export function InventoryKpis({ kpis, loading }: InventoryKpisProps) {
         </div>
         <p className="flex items-center justify-between text-xs text-muted-foreground">
           <span>Retail value</span>
-          <span className="font-semibold text-success tabular-nums">
+          <span className="font-semibold tabular-nums text-success">
             {formatMoney(kpis.valuationRetail)}
           </span>
         </p>
       </Card>
-      <Tile icon={CheckCircle2} label="In-stock SKUs" value={formatNumber(kpis.inStock)} tone="success" hint="Healthy levels" />
-      <Tile icon={AlertTriangle} label="Low stock" value={formatNumber(kpis.low)} tone="warning" hint="At/below reorder" />
-      <Tile icon={XCircle} label="Out of stock" value={formatNumber(kpis.out)} tone={kpis.out > 0 ? "danger" : "muted"} hint="Zero on hand" />
-      <Tile icon={Truck} label="In-transit" value={formatNumber(kpis.inTransit)} tone="muted" hint="Shipments moving" />
+      <Tile
+        icon={CheckCircle2}
+        label="In-stock SKUs"
+        value={formatNumber(kpis.inStock)}
+        tone="success"
+        hint="Healthy levels"
+      />
+      <Tile
+        icon={AlertTriangle}
+        label="Low stock"
+        value={formatNumber(kpis.low)}
+        tone="warning"
+        hint="At/below reorder"
+      />
+      <Tile
+        icon={XCircle}
+        label="Out of stock"
+        value={formatNumber(kpis.out)}
+        tone={kpis.out > 0 ? "danger" : "muted"}
+        hint="Zero on hand"
+      />
+      <Tile
+        icon={Truck}
+        label="In-transit"
+        value={formatNumber(kpis.inTransit)}
+        tone="muted"
+        hint="Shipments moving"
+      />
     </div>
   );
 }
@@ -80,7 +105,12 @@ function Tile({
         </span>
         <Icon className={cn("size-4", toneClass)} />
       </div>
-      <div className={cn("font-display text-kpi tabular-nums", tone === "danger" ? "text-destructive" : "text-foreground")}>
+      <div
+        className={cn(
+          "font-display text-kpi tabular-nums",
+          tone === "danger" ? "text-destructive" : "text-foreground",
+        )}
+      >
         {value}
       </div>
       <p className="text-xs text-muted-foreground">{hint}</p>

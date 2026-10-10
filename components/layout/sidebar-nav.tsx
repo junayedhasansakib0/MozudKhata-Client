@@ -42,10 +42,7 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
                 {item.badge ? (
                   <Badge
                     variant={active ? "secondary" : "success"}
-                    className={cn(
-                      "px-1.5 py-0",
-                      active && "bg-primary-foreground/20 text-primary-foreground",
-                    )}
+                    className={cn("px-1.5 py-0", active && "bg-primary-foreground text-primary")}
                   >
                     {item.badge}
                   </Badge>

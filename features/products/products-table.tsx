@@ -61,7 +61,7 @@ function StockCell({ product }: { product: Product }) {
   return (
     <div className="flex min-w-[180px] flex-col gap-1.5">
       <div className="flex items-baseline justify-between gap-2">
-        <span className="font-display text-headline-sm font-semibold tabular-nums text-foreground">
+        <span className="text-headline-sm font-display font-semibold tabular-nums text-foreground">
           {total} <span className="text-xs font-normal text-muted-foreground">units</span>
         </span>
         <StockBadge product={product} />
@@ -78,7 +78,7 @@ function StockCell({ product }: { product: Product }) {
           ) : null,
         )}
       </div>
-      <div className="flex flex-wrap items-center gap-x-2 text-label-sm text-muted-foreground">
+      <div className="text-label-sm flex flex-wrap items-center gap-x-2 text-muted-foreground">
         {perStore.map((s) => (
           <span key={s.name} className="tabular-nums">
             {s.name.split(" ")[0]}: {s.qty}
@@ -97,7 +97,7 @@ function VariantSubRow({ variant }: { variant: ProductVariant }) {
     <TableRow className="bg-muted/30">
       <TableCell />
       <TableCell>
-        <div className="flex items-center gap-2 pl-9">
+        <div className="flex items-center gap-2 ps-9">
           <span
             className={cn(
               "size-2 rounded-full",
@@ -108,16 +108,20 @@ function VariantSubRow({ variant }: { variant: ProductVariant }) {
         </div>
       </TableCell>
       <TableCell>
-        <div className="flex flex-col font-mono text-code-sku">
+        <div className="text-code-sku flex flex-col font-mono">
           <span className="font-medium text-foreground">{variant.sku}</span>
-          <span className="text-[11px] text-muted-foreground">{variant.barcode ?? "No barcode"}</span>
+          <span className="text-[11px] text-muted-foreground">
+            {variant.barcode ?? "No barcode"}
+          </span>
         </div>
       </TableCell>
-      <TableCell className="text-center text-label-sm text-muted-foreground">{variant.unit}</TableCell>
-      <TableCell className="text-right font-mono text-code-sku text-muted-foreground">
+      <TableCell className="text-label-sm text-center text-muted-foreground">
+        {variant.unit}
+      </TableCell>
+      <TableCell className="text-code-sku text-end font-mono text-muted-foreground">
         {money(variant.costPrice.amountMinor, currency)}
       </TableCell>
-      <TableCell className="text-right">
+      <TableCell className="text-end">
         <div className="flex items-center justify-end gap-2">
           <span className="font-semibold tabular-nums text-foreground">
             {money(variant.sellPrice.amountMinor, currency)}
@@ -167,7 +171,11 @@ function ProductRow({
     <>
       <TableRow data-state={selected ? "selected" : undefined}>
         <TableCell>
-          <Checkbox checked={selected} onCheckedChange={onToggleSelect} aria-label={`Select ${product.name}`} />
+          <Checkbox
+            checked={selected}
+            onCheckedChange={onToggleSelect}
+            aria-label={`Select ${product.name}`}
+          />
         </TableCell>
         <TableCell>
           <div className="flex items-center gap-3">
@@ -179,7 +187,11 @@ function ProductRow({
                 aria-label={expanded ? "Collapse variants" : "Expand variants"}
                 aria-expanded={expanded}
               >
-                {expanded ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
+                {expanded ? (
+                  <ChevronDown className="size-4" />
+                ) : (
+                  <ChevronRight className="size-4" />
+                )}
               </button>
             ) : (
               <span className="w-6" />
@@ -188,7 +200,7 @@ function ProductRow({
               <button
                 type="button"
                 onClick={onView}
-                className="truncate text-left text-sm font-semibold text-foreground hover:text-primary"
+                className="truncate text-start text-sm font-semibold text-foreground hover:text-primary"
               >
                 {product.name}
               </button>
@@ -202,7 +214,7 @@ function ProductRow({
           </div>
         </TableCell>
         <TableCell>
-          <div className="flex flex-col font-mono text-code-sku">
+          <div className="text-code-sku flex flex-col font-mono">
             <span className="font-semibold text-foreground">{product.variants[0]?.sku}</span>
             <span className="text-[11px] text-muted-foreground">
               {product.isVariable
@@ -218,12 +230,12 @@ function ProductRow({
             <Badge variant="secondary">Single item</Badge>
           )}
         </TableCell>
-        <TableCell className="text-right font-mono text-code-sku text-muted-foreground">
+        <TableCell className="text-code-sku text-end font-mono text-muted-foreground">
           {priceRange(cost.min, cost.max, currency)}
         </TableCell>
-        <TableCell className="text-right">
+        <TableCell className="text-end">
           <div className="flex flex-col items-end">
-            <span className="font-display text-headline-sm font-semibold tabular-nums text-foreground">
+            <span className="text-headline-sm font-display font-semibold tabular-nums text-foreground">
               {priceRange(sell.min, sell.max, currency)}
             </span>
             <span className="text-label-sm font-semibold text-success">
@@ -243,13 +255,34 @@ function ProductRow({
         </TableCell>
         <TableCell>
           <div className="flex items-center justify-end gap-0.5 text-muted-foreground">
-            <Button variant="ghost" size="icon" className="size-8" onClick={onView} title="View details">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-8"
+              onClick={onView}
+              title="View details"
+              aria-label="View details"
+            >
               <Eye className="size-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="size-8" onClick={onEdit} title="Edit product">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-8"
+              onClick={onEdit}
+              title="Edit product"
+              aria-label="Edit product"
+            >
               <Pencil className="size-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="size-8" title="Print barcode label" disabled>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-8"
+              title="Print barcode label"
+              aria-label="Print barcode label"
+              disabled
+            >
               <QrCode className="size-4" />
             </Button>
           </div>
@@ -316,11 +349,11 @@ export function ProductsTable({
             <TableHead className="min-w-[260px]">Product</TableHead>
             <TableHead className="min-w-[160px]">SKU &amp; barcode</TableHead>
             <TableHead className="text-center">Structure</TableHead>
-            <TableHead className="text-right">Cost</TableHead>
-            <TableHead className="text-right min-w-[150px]">Sell &amp; margin</TableHead>
+            <TableHead className="text-end">Cost</TableHead>
+            <TableHead className="min-w-[150px] text-end">Sell &amp; margin</TableHead>
             <TableHead className="min-w-[180px]">Stock across stores</TableHead>
             <TableHead className="text-center">Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="text-end">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -338,7 +371,7 @@ export function ProductsTable({
         </TableBody>
       </Table>
 
-      <div className="flex flex-col items-center justify-between gap-3 border-t border-border bg-muted/30 p-3 text-label-md text-muted-foreground sm:flex-row">
+      <div className="text-label-md flex flex-col items-center justify-between gap-3 border-t border-border bg-muted/30 p-3 text-muted-foreground sm:flex-row">
         <div className="flex items-center gap-2">
           <span className="tabular-nums">
             Showing {from}–{to} of {total}
@@ -381,4 +414,3 @@ export function ProductsTable({
     </div>
   );
 }
-

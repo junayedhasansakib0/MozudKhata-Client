@@ -41,7 +41,7 @@ export function CartLineRow({ line, onQty, onRemove }: CartLineRowProps) {
           <Plus className="size-3.5" />
         </button>
       </div>
-      <div className="w-16 text-right text-sm font-semibold tabular-nums text-foreground">
+      <div className="w-16 text-end text-sm font-semibold tabular-nums text-foreground">
         {money(line.unitPriceMinor * line.quantity)}
       </div>
       <button

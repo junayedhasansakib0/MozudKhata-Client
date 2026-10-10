@@ -6,8 +6,17 @@ import { ArrowRight, Plus, Truck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/states/empty-state";
+import { ErrorState } from "@/components/states/error-state";
 import {
   Table,
   TableBody,
@@ -47,6 +56,7 @@ export function TransfersPanel({ storeId, stores }: TransfersPanelProps) {
   const { ship, cancel } = useInventoryMutations();
   const [formOpen, setFormOpen] = React.useState(false);
   const [receiving, setReceiving] = React.useState<StockTransfer | null>(null);
+  const [canceling, setCanceling] = React.useState<StockTransfer | null>(null);
 
   async function doShip(transfer: StockTransfer) {
     try {
@@ -57,10 +67,12 @@ export function TransfersPanel({ storeId, stores }: TransfersPanelProps) {
     }
   }
 
-  async function doCancel(transfer: StockTransfer) {
+  async function confirmCancel() {
+    if (!canceling) return;
     try {
-      await cancel.mutateAsync(transfer.id);
-      toast.success(`Cancelled ${transfer.reference}`);
+      await cancel.mutateAsync(canceling.id);
+      toast.success(`Cancelled ${canceling.reference}`);
+      setCanceling(null);
     } catch (error) {
       toast.error(toUserMessage(error));
     }
@@ -77,7 +89,9 @@ export function TransfersPanel({ storeId, stores }: TransfersPanelProps) {
         </Button>
       </div>
 
-      {transfersQuery.isLoading ? (
+      {transfersQuery.isError ? (
+        <ErrorState error={transfersQuery.error} onRetry={() => transfersQuery.refetch()} />
+      ) : transfersQuery.isLoading ? (
         <Skeleton className="h-64 w-full" />
       ) : transfers.length === 0 ? (
         <EmptyState
@@ -101,13 +115,13 @@ export function TransfersPanel({ storeId, stores }: TransfersPanelProps) {
                 <TableHead className="text-center">Items</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Updated</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-end">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {transfers.map((transfer) => (
                 <TableRow key={transfer.id}>
-                  <TableCell className="font-mono text-code-sku font-semibold text-foreground">
+                  <TableCell className="text-code-sku font-mono font-semibold text-foreground">
                     {transfer.reference}
                   </TableCell>
                   <TableCell>
@@ -131,12 +145,18 @@ export function TransfersPanel({ storeId, stores }: TransfersPanelProps) {
                     </span>
                   </TableCell>
                   <TableCell className="text-xs text-muted-foreground">
-                    {formatRelativeTime(transfer.receivedAt ?? transfer.shippedAt ?? transfer.createdAt)}
+                    {formatRelativeTime(
+                      transfer.receivedAt ?? transfer.shippedAt ?? transfer.createdAt,
+                    )}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     <div className="flex items-center justify-end gap-1.5">
                       {transfer.status === "draft" ? (
-                        <Button size="sm" onClick={() => doShip(transfer)} disabled={ship.isPending}>
+                        <Button
+                          size="sm"
+                          onClick={() => doShip(transfer)}
+                          disabled={ship.isPending}
+                        >
                           Ship
                         </Button>
                       ) : null}
@@ -149,7 +169,7 @@ export function TransfersPanel({ storeId, stores }: TransfersPanelProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => doCancel(transfer)}
+                          onClick={() => setCanceling(transfer)}
                           disabled={cancel.isPending}
                         >
                           Cancel
@@ -177,6 +197,30 @@ export function TransfersPanel({ storeId, stores }: TransfersPanelProps) {
         onOpenChange={(open) => !open && setReceiving(null)}
         transfer={receiving}
       />
+      <Dialog open={canceling !== null} onOpenChange={(open) => !open && setCanceling(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel this transfer?</DialogTitle>
+            <DialogDescription>
+              {canceling
+                ? `Transfer ${canceling.reference} (${canceling.fromStoreName} → ${canceling.toStoreName}) will be cancelled in the mock ledger. This cannot be undone.`
+                : ""}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setCanceling(null)}
+              disabled={cancel.isPending}
+            >
+              Keep transfer
+            </Button>
+            <Button variant="destructive" onClick={confirmCancel} disabled={cancel.isPending}>
+              {cancel.isPending ? "Cancelling…" : "Cancel transfer"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

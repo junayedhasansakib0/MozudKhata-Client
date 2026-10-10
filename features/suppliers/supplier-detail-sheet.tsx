@@ -56,7 +56,7 @@ export function SupplierDetailSheet({
       <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-2xl">
         {supplier ? (
           <>
-            <SheetHeader className="border-b border-border bg-muted/40 p-5 text-left">
+            <SheetHeader className="border-b border-border bg-muted/40 p-5 text-start">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1">
                   <SheetTitle>{supplier.name}</SheetTitle>
@@ -99,8 +99,8 @@ export function SupplierDetailSheet({
                         <TableHead>PO</TableHead>
                         <TableHead>Date</TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Total</TableHead>
-                        <TableHead className="text-right">Paid</TableHead>
+                        <TableHead className="text-end">Total</TableHead>
+                        <TableHead className="text-end">Paid</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -117,10 +117,10 @@ export function SupplierDetailSheet({
                               {po.status.replace("_", " ")}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-code-sku text-right font-mono text-foreground">
+                          <TableCell className="text-code-sku text-end font-mono text-foreground">
                             {formatMoney(po.total)}
                           </TableCell>
-                          <TableCell className="text-code-sku text-right font-mono text-muted-foreground">
+                          <TableCell className="text-code-sku text-end font-mono text-muted-foreground">
                             {formatMoney(po.amountPaid)}
                           </TableCell>
                         </TableRow>

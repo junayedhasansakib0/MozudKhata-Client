@@ -32,7 +32,13 @@ const MODES: { value: BulkPriceMode; label: string; unit: "pct" | "amount" }[] =
   { value: "set", label: "Set to amount", unit: "amount" },
 ];
 
-export function BulkPriceDialog({ open, onOpenChange, count, pending, onApply }: BulkPriceDialogProps) {
+export function BulkPriceDialog({
+  open,
+  onOpenChange,
+  count,
+  pending,
+  onApply,
+}: BulkPriceDialogProps) {
   const [target, setTarget] = React.useState<"sell" | "cost">("sell");
   const [mode, setMode] = React.useState<BulkPriceMode>("increase_pct");
   const [value, setValue] = React.useState("");
@@ -61,15 +67,33 @@ export function BulkPriceDialog({ open, onOpenChange, count, pending, onApply }:
         </DialogHeader>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label className="text-label-sm uppercase tracking-wide text-muted-foreground">Price</Label>
-            <NativeSelect value={target} onChange={(e) => setTarget(e.target.value as "sell" | "cost")}>
+            <Label
+              htmlFor="bulk-price-target"
+              className="text-label-sm uppercase tracking-wide text-muted-foreground"
+            >
+              Price
+            </Label>
+            <NativeSelect
+              id="bulk-price-target"
+              value={target}
+              onChange={(e) => setTarget(e.target.value as "sell" | "cost")}
+            >
               <option value="sell">Sell price</option>
               <option value="cost">Cost price</option>
             </NativeSelect>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-label-sm uppercase tracking-wide text-muted-foreground">Operation</Label>
-            <NativeSelect value={mode} onChange={(e) => setMode(e.target.value as BulkPriceMode)}>
+            <Label
+              htmlFor="bulk-price-mode"
+              className="text-label-sm uppercase tracking-wide text-muted-foreground"
+            >
+              Operation
+            </Label>
+            <NativeSelect
+              id="bulk-price-mode"
+              value={mode}
+              onChange={(e) => setMode(e.target.value as BulkPriceMode)}
+            >
               {MODES.map((m) => (
                 <option key={m.value} value={m.value}>
                   {m.label}
@@ -79,7 +103,10 @@ export function BulkPriceDialog({ open, onOpenChange, count, pending, onApply }:
           </div>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="bulk-price-value" className="text-label-sm uppercase tracking-wide text-muted-foreground">
+          <Label
+            htmlFor="bulk-price-value"
+            className="text-label-sm uppercase tracking-wide text-muted-foreground"
+          >
             {unit === "pct" ? "Percent" : "Amount"}
           </Label>
           <Input
