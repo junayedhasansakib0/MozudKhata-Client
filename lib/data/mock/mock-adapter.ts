@@ -58,7 +58,36 @@ import {
   updateCustomer,
 } from "./customers";
 import { createRefund, getOrder, listOrders, ordersForCustomer, salesKpis } from "./sales";
-import { seedActiveStoreId, seedNotifications, seedStores, seedTenant, seedUser } from "./seed";
+import {
+  createExpense,
+  expenseKpis,
+  listExpenses,
+  removeExpense,
+  updateExpense,
+} from "./expenses";
+import { getReport } from "./reports";
+import {
+  createEmployee,
+  listEmployees,
+  listRoles,
+  setEmployeeStatus,
+  toggleRolePermission,
+  updateEmployee,
+} from "./staff";
+import {
+  createStore,
+  getStoreAdmin,
+  listStoresAdmin,
+  setStoreStatus,
+  updateStore,
+} from "./stores";
+import {
+  listNotifications,
+  markAllNotificationsRead,
+  markNotificationRead,
+  unreadNotificationCount,
+} from "./notifications";
+import { seedActiveStoreId, seedStores, seedTenant, seedUser } from "./seed";
 
 // Simulate network latency in the browser so loading states are visible during
 // development; resolve immediately under tests to keep them fast.
@@ -152,21 +181,41 @@ export function createMockDataSource(): DataSource {
     stores: {
       async list(): Promise<Store[]> {
         await delay();
-        return clone(seedStores);
+        return listStoresAdmin();
       },
       async getById(id: Id): Promise<Store | null> {
         await delay();
-        return clone(seedStores.find((store) => store.id === id) ?? null);
+        return getStoreAdmin(id);
+      },
+      async create(input) {
+        await delay();
+        return createStore(input);
+      },
+      async update(id, input) {
+        await delay();
+        return updateStore(id, input);
+      },
+      async setStatus(id, status) {
+        await delay();
+        return setStoreStatus(id, status);
       },
     },
     notifications: {
       async list(): Promise<AppNotification[]> {
         await delay();
-        return clone(seedNotifications);
+        return listNotifications();
       },
       async unreadCount(): Promise<number> {
         await delay();
-        return seedNotifications.filter((n) => !n.read).length;
+        return unreadNotificationCount();
+      },
+      async markRead(id) {
+        await delay();
+        markNotificationRead(id);
+      },
+      async markAllRead() {
+        await delay();
+        markAllNotificationsRead();
       },
     },
     dashboard: {
@@ -425,6 +474,60 @@ export function createMockDataSource(): DataSource {
       async createRefund(input) {
         await delay();
         return createRefund(input);
+      },
+    },
+    expenses: {
+      async list(params) {
+        await delay();
+        return listExpenses(params);
+      },
+      async getKpis(params) {
+        await delay();
+        return expenseKpis(params?.storeId);
+      },
+      async create(input) {
+        await delay();
+        return createExpense(input);
+      },
+      async update(id, input) {
+        await delay();
+        return updateExpense(id, input);
+      },
+      async remove(id) {
+        await delay();
+        removeExpense(id);
+      },
+    },
+    reports: {
+      async get(key, params) {
+        await delay();
+        return getReport(key, params);
+      },
+    },
+    staff: {
+      async listEmployees() {
+        await delay();
+        return listEmployees();
+      },
+      async createEmployee(input) {
+        await delay();
+        return createEmployee(input);
+      },
+      async updateEmployee(id, input) {
+        await delay();
+        return updateEmployee(id, input);
+      },
+      async setEmployeeStatus(id, status) {
+        await delay();
+        return setEmployeeStatus(id, status);
+      },
+      async listRoles() {
+        await delay();
+        return listRoles();
+      },
+      async toggleRolePermission(roleId, permission, enabled) {
+        await delay();
+        return toggleRolePermission(roleId, permission, enabled);
       },
     },
   };

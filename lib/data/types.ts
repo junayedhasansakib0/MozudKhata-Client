@@ -36,6 +36,14 @@ export interface Store {
   status: StoreStatus;
 }
 
+export interface StoreInput {
+  name: string;
+  code: string;
+  city: string;
+  currency: string;
+  status: StoreStatus;
+}
+
 /** Seeded RBAC roles (see docs/security.md). */
 export type RoleKey = "owner" | "store_manager" | "cashier" | "inventory_supervisor";
 
@@ -762,6 +770,139 @@ export interface Refund {
   createdBy: string;
   createdAt: string;
   items: RefundItem[];
+}
+
+// --- Expenses ---
+
+export type ExpenseCategory =
+  | "rent"
+  | "utilities"
+  | "payroll"
+  | "supplies"
+  | "marketing"
+  | "maintenance"
+  | "logistics"
+  | "other";
+
+export interface Expense {
+  id: Id;
+  storeId: Id;
+  storeName: string;
+  category: ExpenseCategory;
+  amount: Money;
+  description?: string;
+  spentAt: string; // ISO date
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface ExpenseInput {
+  storeId: Id;
+  category: ExpenseCategory;
+  amountMinor: number;
+  description?: string;
+  spentAt: string;
+}
+
+export interface ExpenseListParams {
+  storeId?: Id;
+  category?: ExpenseCategory | "all";
+  q?: string;
+}
+
+export interface ExpenseKpis {
+  totalThisPeriod: Money;
+  topCategory: { category: ExpenseCategory; amount: Money } | null;
+  count: number;
+}
+
+// --- Reports ---
+
+export type ReportKey =
+  | "sales"
+  | "profit"
+  | "inventory"
+  | "purchases"
+  | "customers"
+  | "suppliers"
+  | "expenses"
+  | "tax";
+
+export interface ReportKpi {
+  label: string;
+  value: string;
+}
+
+export interface ReportChartPoint {
+  label: string;
+  value: number; // minor units or count (chart is relative)
+}
+
+export interface ReportDataset {
+  key: ReportKey;
+  title: string;
+  description: string;
+  kpis: ReportKpi[];
+  chartLabel: string;
+  chart: ReportChartPoint[];
+  columns: string[];
+  rows: string[][];
+}
+
+export interface ReportParams {
+  range: "today" | "7d" | "30d" | "90d";
+  storeId?: Id;
+}
+
+// --- Staff & RBAC ---
+
+export type PermissionKey =
+  | "pos.sell"
+  | "pos.discount.override"
+  | "sales.refund"
+  | "inventory.adjust"
+  | "inventory.transfer"
+  | "purchases.manage"
+  | "products.manage"
+  | "customers.manage"
+  | "reports.view"
+  | "staff.manage"
+  | "settings.manage"
+  | "drawer.pop";
+
+export interface PermissionDef {
+  key: PermissionKey;
+  label: string;
+  group: string;
+}
+
+export interface Role {
+  id: Id;
+  name: string;
+  isSystem: boolean;
+  permissions: PermissionKey[];
+}
+
+export type EmployeeStatus = "active" | "inactive";
+
+export interface Employee {
+  id: Id;
+  fullName: string;
+  email: string;
+  roleId: Id;
+  roleName: string;
+  storeId: Id | null; // null = all stores
+  storeName: string;
+  status: EmployeeStatus;
+  lastActiveAt?: string;
+}
+
+export interface EmployeeInput {
+  fullName: string;
+  email: string;
+  roleId: Id;
+  storeId: Id | null;
+  status: EmployeeStatus;
 }
 
 export interface ReceiptLine {

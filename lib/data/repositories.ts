@@ -29,9 +29,20 @@ import type {
   Customer,
   CustomerInput,
   CustomerListItem,
+  Employee,
+  EmployeeInput,
+  Expense,
+  ExpenseInput,
+  ExpenseKpis,
+  ExpenseListParams,
+  PermissionKey,
   ReceivePurchaseInput,
   ReceiveTransferInput,
   Refund,
+  ReportDataset,
+  ReportKey,
+  ReportParams,
+  Role,
   SaleOrder,
   SalesKpis,
   SalesListParams,
@@ -39,6 +50,7 @@ import type {
   StockMovement,
   StockTransfer,
   Store,
+  StoreInput,
   Supplier,
   SupplierInput,
   SupplierListItem,
@@ -61,11 +73,16 @@ export interface SessionRepository {
 export interface StoresRepository {
   list(): Promise<Store[]>;
   getById(id: Id): Promise<Store | null>;
+  create(input: StoreInput): Promise<Store>;
+  update(id: Id, input: StoreInput): Promise<Store>;
+  setStatus(id: Id, status: "active" | "inactive"): Promise<Store>;
 }
 
 export interface NotificationsRepository {
   list(): Promise<AppNotification[]>;
   unreadCount(): Promise<number>;
+  markRead(id: Id): Promise<void>;
+  markAllRead(): Promise<void>;
 }
 
 export type DateRangeKey = "today" | "7d" | "30d" | "90d";
@@ -179,6 +196,30 @@ export interface SalesRepository {
   createRefund(input: CreateRefundInput): Promise<Refund>;
 }
 
+/** Expense tracking (CRUD + filters). */
+export interface ExpensesRepository {
+  list(params?: ExpenseListParams): Promise<Expense[]>;
+  getKpis(params?: { storeId?: Id }): Promise<ExpenseKpis>;
+  create(input: ExpenseInput): Promise<Expense>;
+  update(id: Id, input: ExpenseInput): Promise<Expense>;
+  remove(id: Id): Promise<void>;
+}
+
+/** Report datasets (derived) for the analytics surfaces. */
+export interface ReportsRepository {
+  get(key: ReportKey, params: ReportParams): Promise<ReportDataset>;
+}
+
+/** Staff + RBAC: employees, roles, and the permission matrix. */
+export interface StaffRepository {
+  listEmployees(): Promise<Employee[]>;
+  createEmployee(input: EmployeeInput): Promise<Employee>;
+  updateEmployee(id: Id, input: EmployeeInput): Promise<Employee>;
+  setEmployeeStatus(id: Id, status: "active" | "inactive"): Promise<Employee>;
+  listRoles(): Promise<Role[]>;
+  toggleRolePermission(roleId: Id, permission: PermissionKey, enabled: boolean): Promise<Role>;
+}
+
 export interface SignupInput {
   businessName: string;
   fullName: string;
@@ -219,4 +260,7 @@ export interface DataSource {
   readonly purchases: PurchasesRepository;
   readonly customers: CustomersRepository;
   readonly sales: SalesRepository;
+  readonly expenses: ExpensesRepository;
+  readonly reports: ReportsRepository;
+  readonly staff: StaffRepository;
 }

@@ -1,17 +1,7 @@
-import { Settings } from "lucide-react";
-
-import { PlaceholderPage } from "@/components/states/placeholder-page";
+import { SettingsView } from "@/features/settings/settings-view";
 
 export const metadata = { title: "Settings" };
 
 export default function SettingsPage() {
-  return (
-    <PlaceholderPage
-      eyebrow="Configuration"
-      title="Settings"
-      description="Business, currency, tax, invoice, payments, security, and appearance."
-      phase="Phase 10"
-      icon={Settings}
-    />
-  );
+  return <SettingsView />;
 }
